@@ -1,6 +1,10 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import Layout from "./components/layout";
 import Downloading from "./components/downloading";
+import Stopped from "./components/stopped";
+import New from "./components/new";
+import Detail from "./components/detail";
+import Test from "./components/test";
 
 export default () => {
   return (
@@ -8,7 +12,10 @@ export default () => {
       <Route path="/" element={<Layout />}>
         <Route path="downloading" element={<Downloading />} />
         <Route path="waiting" element={<h1>waiting</h1>} />
-        <Route path="stopped" element={<h1>stopped</h1>} />
+        <Route path="stopped" element={<Stopped />} />
+        <Route path="new" element={<New />} />
+        <Route path="test" element={<Test />} />
+        <Route path="task/detail/:gid" element={<Detail />} />
         <Route path="settings">
           <Route path="ui" element={<h1>ui</h1>} />
           <Route path="aria2">

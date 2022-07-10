@@ -9,8 +9,10 @@ import {
   IconSort,
   IconGithubLogo,
 } from "@douyinfe/semi-icons";
+import { useNavigate } from "react-router-dom";
 
 export default () => {
+  const navigate = useNavigate()
   return (
     <>
       <Nav
@@ -22,6 +24,9 @@ export default () => {
               icon={<IconPlus size="large" />}
               style={{
                 color: "var(--semi-color-primary)",
+              }}
+              onClick={() => {
+                navigate("/new");
               }}
             >
               新建

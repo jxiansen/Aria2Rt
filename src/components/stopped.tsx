@@ -1,13 +1,14 @@
 import { Table, Progress, Tooltip } from "@douyinfe/semi-ui";
-import * as dateFns from "date-fns";
 import store from "./../store";
-import { sizeTostr, convertSpeed, formatSeconds } from "./../tool";
-import { divide, floor, reduce, round } from "lodash";
+import { sizeTostr } from "./../tool";
+import { divide, floor } from "lodash";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
+import { useInterval, useMount, useRequest } from "ahooks";
+import { useState } from "react";
 
 export default function App() {
-  const { active } = store;
+  const { active, client } = store;
   console.log(active);
   const navigate = useNavigate();
 
@@ -52,33 +53,7 @@ export default function App() {
         );
       },
     },
-    {
-      title: "剩余时间",
-      dataIndex: "remainTime",
-      render: (data: any, record: any, index: number) => {
-        return formatSeconds(record.downloadSpeed, record.totalLength);
-      },
-    },
-    {
-      title: "下载速度",
-      dataIndex: "downloadSpeed",
-      render: (speed: string, record: any) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <span>{convertSpeed(speed)}</span>
-            <span style={{ color: "#208fe5", fontSize: "13px" }}>
-              ({record.numSeeders ? record.numSeeders : 0}/{record.connections})
-            </span>
-          </div>
-        );
-      },
-    },
+
     {
       title: "查看详情",
       dataIndex: "navigate",

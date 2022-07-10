@@ -1,6 +1,8 @@
 export default class Aria2Client {
   ws: WebSocket;
   id: number;
+  readyPromise: Promise<Aria2Client>;
+
   callbacks: {
     // 该对象纪录每一个id的请求对应的回调函数
     // 内容为 id => callback
@@ -16,6 +18,7 @@ export default class Aria2Client {
     this.ws = new WebSocket(url);
     this.id = 1;
 
+    // 监听发送消息事件,将事件中的数据解析出来
     this.ws.addEventListener("message", (e) => {
       var data = JSON.parse(e.data);
       var id = data.id;
@@ -27,6 +30,20 @@ export default class Aria2Client {
         // 说明是事件如： onDownloadStart, onDownloadError
       }
     });
+
+    /**
+     * 构建出这个client的时候就创建一个 Promise ,这个Promise等待监听到 webSocket Open连接成功事件的时候 resolve
+     */
+    // 监听webSocket建立成功事件
+    this.readyPromise = new Promise((resolve) => {
+      this.ws.addEventListener("open", (e) => {
+        resolve(this);
+      });
+    });
+  }
+
+  ready() {
+    return this.readyPromise;
   }
 
   addUri(...args: any[]) {

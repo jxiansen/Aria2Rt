@@ -1,4 +1,4 @@
-import { Collapse, Nav } from "@douyinfe/semi-ui";
+import { Badge, Collapse, Nav } from "@douyinfe/semi-ui";
 import {
   IconDuration,
   IconServer,
@@ -9,9 +9,11 @@ import {
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { useImmer } from "use-immer";
+import store from "./../store";
 
 export default () => {
   const navigate = useNavigate();
+  const { numActive, numWaiting, numStopped } = store.globalState;
   const [selectedKey, setSelectedKey] = useImmer([]);
   return (
     <Nav
@@ -25,17 +27,19 @@ export default () => {
       items={[
         {
           itemKey: "downloading",
-          text: "正在下载",
+          text: +numActive ? `正在下载(${numActive})` : `正在下载`,
           icon: <IconDownload size="large" />,
         },
         {
           itemKey: "waiting",
-          text: "正在等待",
+          text: +numWaiting ? `正在等待(${numWaiting})` : "正在等待",
           icon: <IconClock size="large" />,
         },
         {
           itemKey: "stopped",
-          text: "已完成/已经停止",
+          text: +numStopped
+            ? `已完成/已经停止(${numStopped})`
+            : "已完成/已经停止",
           icon: <IconTickCircle size="large" />,
         },
         {
