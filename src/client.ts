@@ -1,7 +1,7 @@
-export default class Aria2Client {
+class Client {
   ws: WebSocket;
   id: number;
-  readyPromise: Promise<Aria2Client>;
+  readyPromise: Promise<Client>;
 
   callbacks: {
     // 该对象纪录每一个id的请求对应的回调函数
@@ -9,63 +9,37 @@ export default class Aria2Client {
     [id: number]: (data: any) => void;
   } = {};
 
-  constructor(
-    public ip: string = "127.0.0.1",
-    public port: number | string,
-    public secret: string
-  ) {
-    var url = `ws://${ip}:${port}/jsonrpc`;
+  constructor(public url: string, public secret: string) {
     this.ws = new WebSocket(url);
     this.id = 1;
-
     // 监听发送消息事件,将事件中的数据解析出来
-    this.ws.addEventListener("message", (e) => {
-      var data = JSON.parse(e.data);
-      var id = data.id;
-      if (id) {
-        var callback = this.callbacks[id];
-        callback(data);
-        // delete this.callbacks[id];
-      } else {
-        // 说明是事件如： onDownloadStart, onDownloadError
-      }
-    });
-
-    /**
-     * 构建出这个client的时候就创建一个 Promise ,这个Promise等待监听到 webSocket Open连接成功事件的时候 resolve
-     */
-    // 监听webSocket建立成功事件
-    this.readyPromise = new Promise((resolve) => {
-      this.ws.addEventListener("open", (e) => {
-        resolve(this);
-      });
-    });
-  }
-
-  ready() {
-    return this.readyPromise;
-  }
-
-  addUri(...args: any[]) {
-    return new Promise((resolve, reject) => {
-      var id = this.id++;
-      function callback(data: any) {
-        if (data.error) {
-          reject(data.error);
-        } else {
-          resolve(data.result);
+    this.ws.onmessage = (e) => {
+      console.log("收到消息");
+      try {
+        const data = JSON.parse(e.data);
+        const id = data.id;
+        if (id) {
+          const callback = this.callbacks[id];
+          delete this.callbacks[id];
+          callback(data);
         }
+      } catch (err) {
+        console.log(err);
       }
-
-      this.callbacks[id] = callback;
-      this.ws.send(
-        JSON.stringify({
-          jsonrpc: "2.0",
-          id: id,
-          method: "aria2.addUri",
-          params: [`token:${this.secret}`, ...args],
-        })
-      );
+    };
+    this.ws.onopen = (e) => {
+      console.log(`连接开启`);
+    };
+    this.ws.onclose = (e) => {
+      console.log("连接关闭");
+    };
+    this.ws.onerror = (e) => {
+      console.log("连接错误");
+    };
+    this.readyPromise = new Promise((resolve) => {
+      this.ws.onopen = () => {
+        resolve(this);
+      };
     });
   }
 }
@@ -114,7 +88,7 @@ var allMethods = [
 allMethods.forEach((methodName) => {
   var method = methodName.split(".")[1];
   // @ts-ignore
-  Aria2Client.prototype[method] = function (...args: any[]) {
+  Client.prototype[method] = function (...args: any[]) {
     return new Promise((resolve, reject) => {
       var id = this.id++;
       function callback(data: any) {
@@ -138,3 +112,10 @@ allMethods.forEach((methodName) => {
     });
   };
 });
+
+const client = new Client(
+  "ws://81.68.209.144:6800/jsonrpc",
+  "987f21ba8bde8bdaedc7"
+);
+
+export default client;

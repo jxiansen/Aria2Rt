@@ -1,75 +1,134 @@
-import { Tabs, TabPane, Space } from "@douyinfe/semi-ui";
+import { Tabs, TabPane, Table } from "@douyinfe/semi-ui";
 import { HeatMapGrid } from "react-grid-heatmap";
-import store from "./../store";
-import { useEffect, useState } from "react";
-import { useImmer } from "use-immer";
 import { convert } from "./../tool";
-import { useMount } from "ahooks";
+import { useInterval, useMount, useRequest } from "ahooks";
 import { useParams } from "react-router-dom";
+import { useEffect, useMemo } from "react";
+import { IconMore } from "@douyinfe/semi-icons";
+import client from "../client";
+import { useImmer } from "use-immer";
+
 export default () => {
-  const { active } = store;
   let { gid } = useParams();
-  const [data, setData] = useImmer([]);
-  /**
-   * 组件加载时根据参数从store中查询出当前数据
-   */
-  useMount(() => {
-    try {
-      // @ts-ignore
-      const field = active.find((i) => i.gid === gid).bitfield;
-      // @ts-ignore
-      setData(convert(field));
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
+  async function getDetails() {
+    const ready = await client.readyPromise;
+    // @ts-ignore
+    return client.tellStatus(gid);
+    // return ready.getPeers(gid);
+  }
+  const { data, error, loading } = useRequest(getDetails, {
+    pollingInterval: 1000,
   });
-  // console.log(filed);
-  // setData(convert(filed));
+
+  useEffect(() => {
+    if (data) {
+      console.log(data);
+    }
+  }, [data]);
+  const columns = [
+    {
+      dataIndex: "name",
+    },
+    {
+      dataIndex: "value",
+    },
+  ];
+  const tableData = [
+    {
+      key: "1",
+      name: "任务名称",
+      value: 123,
+    },
+    {
+      key: "2",
+      name: "任务大小",
+      value: "2M",
+    },
+    {
+      key: "3",
+      name: "任务状态",
+      value: "2M",
+    },
+    {
+      key: "4",
+      name: "进度",
+      value: "2M",
+    },
+    {
+      key: "5",
+      name: "下载",
+      value: "2M",
+    },
+    {
+      key: "6",
+      name: "上传",
+      value: "2M",
+    },
+    {
+      key: "7",
+      name: "分享率",
+      value: "2M",
+    },
+    {
+      key: "8",
+      name: "剩余时间",
+      value: "2M",
+    },
+    {
+      key: "9",
+      name: "种子数/连接数",
+      value: "2M",
+    },
+    {
+      key: "10",
+      name: "特征值",
+      value: (() => {
+        return data ? data.dir : "";
+      })(),
+    },
+    {
+      key: "11",
+      name: "下载路径",
+      value: (() => {
+        return data ? data.dir : "";
+      })(),
+    },
+    {
+      key: "12",
+      name: "BT服务器",
+      value: (() => {
+        return data ? data.dir : "";
+      })(),
+    },
+  ];
+
+  // function dataToTable(data: object) {
+  //   let tableData = [];
+  //   for (let key in data) {
+  //     if(key )
+  //   }
+  // }
+
   return (
     <div>
       <Tabs type="line">
         <TabPane tab="总览" itemKey="1">
-          <h3>文档</h3>
-          <p style={{ lineHeight: 1.8 }}>
-            Semi Design 是由互娱社区前端团队与 UED
-            团队共同设计开发并维护的设计系统。设计系统包含设计语言以及一整套可复用的前端组件，帮助设计师与开发者更容易地打造高质量的、用户体验一致的、符合设计规范的
-            Web 应用。
-          </p>
-          <p style={{ lineHeight: 1.8 }}>
-            区别于其他的设计系统而言，Semi Design
-            以用户中心、内容优先、设计人性化为设计理念，具有以下优势：
-          </p>
-          <ul>
-            <li>
-              <p>Semi Design 以内容优先进行设计。</p>
-            </li>
-            <li>
-              <p>更容易地自定义主题。</p>
-            </li>
-            <li>
-              <p>适用国际化场景。</p>
-            </li>
-            <li>
-              <p>效率场景加入人性化关怀。</p>
-            </li>
-          </ul>
+          <Table columns={columns} dataSource={tableData} pagination={false} />;
         </TabPane>
         <TabPane tab="区块信息" itemKey="2">
-          <span style={{ textAlign: "center" }}>
-            <span>已经完成</span>
-            <span>未完成</span>
-          </span>
-          <HeatMapGrid
-            data={data}
-            cellStyle={(_x, _y, ratio) => ({
-              background: `rgb(12, 160, 44, ${ratio})`,
-              fontSize: ".8rem",
-              color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
-            })}
-            cellHeight="12px"
-            square
-          />
+          <div style={{ margin: "40px 0 0 50px" }}>
+            <HeatMapGrid
+              // @ts-ignore
+              data={data === undefined ? [] : convert(data.bitfield)}
+              cellStyle={(_x, _y, ratio) => ({
+                background: `rgb(12, 160, 44, ${ratio})`,
+                fontSize: ".8rem",
+                color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
+              })}
+              cellHeight="12px"
+              square
+            />
+          </div>
         </TabPane>
         <TabPane tab="文件列表" itemKey="3">
           <h3>帮助</h3>

@@ -1,53 +1,24 @@
-import { Table, Progress, Tooltip } from "@douyinfe/semi-ui";
-import * as dateFns from "date-fns";
-import {
-  sizeTostr,
-  convertSpeed,
-  formatSeconds,
-  getNameFromFiles,
-} from "./../tool";
-import { divide, floor } from "lodash";
+import { Progress, Tooltip, Table } from "@douyinfe/semi-ui";
+import { useInterval, useMount } from "ahooks";
+import { floor, divide } from "lodash";
+import { getNameFromFiles, sizeTostr } from "../tool";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { useRequest } from "ahooks";
-import client from "../client";
-import { useEffect } from "react";
 import { useImmer } from "use-immer";
 
-async function getActive() {
-  const ready = await client.readyPromise;
-  // @ts-ignore
-  return ready.tellActive([
-    "gid",
-    "totalLength",
-    "completedLength",
-    "uploadSpeed",
-    "downloadSpeed",
-    "connections",
-    "numSeeders",
-    "seeder",
-    "status",
-    "errorCode",
-    "verifiedLength",
-    "verifyIntegrityPending",
-    "files",
-  ]);
-}
-
 export default () => {
-  const { data, error, loading } = useRequest(getActive, {
-    pollingInterval: 1000,
-  });
-
-  const [files, setFiles] = useImmer([]);
-  useEffect(() => {
-    if (data) {
-      setFiles(data.files);
-    }
-    console.log(data);
-  }, [data]);
+  const [dataSource, setDataSource] = useImmer<any[]>([]);
+  const [isLoading, setLoading] = useImmer(true);
 
   const navigate = useNavigate();
+
+  useInterval(() => {
+    ws.send(tellWaiting);
+  }, 10);
+  ws.addEventListener("message", (e) => {
+    setDataSource(JSON.parse(e?.data).result);
+    setLoading(false);
+  });
 
   const columns = [
     {
@@ -68,6 +39,7 @@ export default () => {
     {
       title: "总大小",
       dataIndex: "totalLength",
+      sorter: (a: any, b: any) => (a.totalLength - b.totalLength > 0 ? 1 : -1),
       render: (size: string) => {
         return <div>{sizeTostr(size)}</div>;
       },
@@ -75,6 +47,9 @@ export default () => {
     {
       title: "进度",
       dataIndex: "files2",
+      sorter: (a: any, b: any) =>
+        a.completedLength - b.completedLength > 0 ? 1 : -1,
+
       // text参数是数据源，record是数组中的一个纪录,index是索引
       render: (data: any, record: any, index: number) => {
         const [completed, all] = [+record.completedLength, +record.totalLength];
@@ -90,33 +65,7 @@ export default () => {
         );
       },
     },
-    {
-      title: "剩余时间",
-      dataIndex: "remainTime",
-      render: (data: any, record: any, index: number) => {
-        return formatSeconds(record.downloadSpeed, record.totalLength);
-      },
-    },
-    {
-      title: "下载速度",
-      dataIndex: "downloadSpeed",
-      render: (speed: string, record: any) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <span>{convertSpeed(speed)}</span>
-            <span style={{ color: "#208fe5", fontSize: "13px" }}>
-              ({record.numSeeders ? record.numSeeders : 0}/{record.connections})
-            </span>
-          </div>
-        );
-      },
-    },
+
     {
       title: "查看详情",
       dataIndex: "navigate",
@@ -133,6 +82,11 @@ export default () => {
         );
       },
     },
+    {
+      title: "状态",
+      dataIndex: "status",
+      render: () => "已经暂停",
+    },
   ];
 
   const handleRow = (record: any, index: any) => {
@@ -145,14 +99,14 @@ export default () => {
       };
     }
   };
-
   return (
     <Table
       columns={columns}
-      dataSource={data}
+      dataSource={dataSource}
       pagination={false}
       // @ts-ignore
       onRow={handleRow}
+      loading={isLoading}
     />
   );
 };

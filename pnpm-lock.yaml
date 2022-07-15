@@ -15,9 +15,11 @@ specifiers:
   react-dom: ^18.0.0
   react-grid-heatmap: ^1.2.0
   react-router-dom: ^6.3.0
+  reconnecting-websocket: ^4.4.0
   resso: ^0.6.0
   typescript: ^4.6.3
   use-immer: ^0.7.0
+  validator: ^13.7.0
   vite: ^2.9.9
 
 dependencies:
@@ -32,8 +34,10 @@ dependencies:
   react-dom: 18.2.0_react@18.2.0
   react-grid-heatmap: 1.2.0_react@18.2.0
   react-router-dom: 6.3.0_biqbaboplfbrettd7655fr4n2y
+  reconnecting-websocket: 4.4.0
   resso: 0.6.0_react@18.2.0
   use-immer: 0.7.0_immer@9.0.15+react@18.2.0
+  validator: 13.7.0
 
 devDependencies:
   '@types/react': 18.0.14
@@ -1202,6 +1206,10 @@ packages:
       loose-envify: 1.4.0
     dev: false
 
+  /reconnecting-websocket/4.4.0:
+    resolution: {integrity: sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==}
+    dev: false
+
   /regenerator-runtime/0.13.9:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
     dev: false
@@ -1376,6 +1384,11 @@ packages:
   /utility-types/3.10.0:
     resolution: {integrity: sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==}
     engines: {node: '>= 4'}
+    dev: false
+
+  /validator/13.7.0:
+    resolution: {integrity: sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==}
+    engines: {node: '>= 0.10'}
     dev: false
 
   /vite/2.9.13:

@@ -8,20 +8,27 @@ import {
   TabPane,
   Tabs,
   TextArea,
+  Toast,
 } from "@douyinfe/semi-ui";
+// @ts-ignore
+import { isURL } from "validator";
 import { Typography } from "@douyinfe/semi-ui";
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
-import { IconFolder, IconStar } from "@douyinfe/semi-icons";
+import { IconFolder } from "@douyinfe/semi-icons";
+import { useNavigate } from "react-router-dom";
 export default () => {
   const { Text } = Typography;
   const [rowsCount, setRowsCount] = useImmer(0);
   // 将所有链接存储拼接成一个字符串,最后在split成一个链接数组
   const [links, setLinks] = useImmer("");
+  const [urls, setUrls] = useImmer([]);
+  const navigate = useNavigate();
   useEffect(() => {
     const count = links.split("\n").length - 1;
     setRowsCount(count);
-    console.log();
+    // @ts-ignore
+    setUrls(links.split("\n").filter((i) => !!i));
   }, [links]);
 
   return (
@@ -42,6 +49,28 @@ export default () => {
               setLinks(val);
             }}
           />
+          <Button
+            theme="light"
+            type="tertiary"
+            style={{ marginTop: 28 }}
+            onClick={() => {
+              // 对地址数组中的每一个链接进行检查,如果不符合规范报错提示,成功添加下载任务后跳转回下载页面
+              if (urls.every((i) => isURL(i))) {
+                // 允许提交
+                urls.forEach((url, idx) => {
+                  ws.send(addUri(url));
+                });
+                navigate("/downloading");
+              } else {
+                Toast.info({
+                  content: "链接地址错误,请检查后再提交",
+                  duration: 3,
+                });
+              }
+            }}
+          >
+            立即下载
+          </Button>
         </TabPane>
         <TabPane tab="选项" itemKey="2">
           <h3>快速起步</h3>
@@ -62,14 +91,6 @@ export default () => {
             </Dropdown>
           }
           itemKey="3"
-        />
-        <TabPane
-          tab={
-            <Button theme="light" type="tertiary" style={{ marginBottom: 8 }}>
-              立即下载
-            </Button>
-          }
-          itemKey="4"
         />
       </Tabs>
     </div>

@@ -1,61 +1,48 @@
-import { Layout, Toast, Notification } from "@douyinfe/semi-ui";
-import Aria2Client from "./../aria2-client";
+import { Layout, Notification } from "@douyinfe/semi-ui";
 import FooterContent from "./footer";
 import HeaderContent from "./header";
 import SiderContent from "./sider";
 import { Outlet } from "react-router-dom";
-import { useInterval, useMount } from "ahooks";
+import { useMount, useRequest } from "ahooks";
 import store from "./../store";
+import client from "../client";
 import { useEffect } from "react";
 
-// @ts-ignore
-window.Aria2Client = Aria2Client;
+async function getInfo() {
+  const ready = await client.readyPromise;
+  // @ts-ignore
+  return ready.getGlobalStat();
+}
 
 export default () => {
   const { Header, Footer, Sider, Content } = Layout;
-  // 从store中解构出client实列和全局状态
-  const { client, globalState } = store;
-
-  useMount(() => {
-    client
-      .ready()
-      .then(() => {
-        Notification.success({
-          title: "Hi, Guys",
-          content: "You have connected the Server",
-          duration: 1.5,
-        });
-      })
-      .catch(() => {
-        Notification.error({
-          content: "connect fail",
-          duration: 0,
-        });
-      });
+  const { data, error, loading } = useRequest(getInfo, {
+    pollingInterval: 1000,
   });
 
-  /**
-   * 每隔1秒钟获取一次全局状态,并更新
-   */
-  useInterval(() => {
-    // 当client建立连接成功后执行下一步操作
-    // client.ready().then((client) => {
-    // @ts-ignore
-    client.getGlobalStat().then((data) => {
-      store.globalState = data;
-    });
-     // @ts-ignore
-     client.tellActive().then((data) => {
-      store.active = data;
-    });
-    // });
-  }, 1000);
- 
+  // 从store中解构出client实列和全局状态
+  useMount(() => {
+    if (error) {
+      Notification.error({
+        content: "connect fail",
+        duration: 0,
+      });
+    } else {
+      Notification.success({
+        title: "Hi, Guys",
+        content: "You have connected the Server",
+        duration: 1.5,
+      });
+    }
+  });
 
+  useEffect(() => {
+    if (data) {
+      store.globalState = data;
+    }
+  }, [data]);
   return (
-    <Layout
-      style={{ border: "1px solid var(--semi-color-border)", height: "100vh" }}
-    >
+    <Layout style={{ height: "100vh" }}>
       <Sider style={{ backgroundColor: "var(--semi-color-bg-1)" }}>
         <SiderContent />
       </Sider>
@@ -65,8 +52,9 @@ export default () => {
         </Header>
         <Content
           style={{
-            padding: "24px",
+            padding: "15px",
             backgroundColor: "var(--semi-color-bg-0)",
+            overflow: "auto",
           }}
         >
           <Outlet />
