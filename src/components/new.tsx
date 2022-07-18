@@ -1,10 +1,6 @@
 import {
-  Avatar,
-  Badge,
   Button,
-  Divider,
   Dropdown,
-  Nav,
   TabPane,
   Tabs,
   TextArea,
@@ -17,6 +13,7 @@ import { useEffect } from "react";
 import { useImmer } from "use-immer";
 import { IconFolder } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
+import client from "../client";
 export default () => {
   const { Text } = Typography;
   const [rowsCount, setRowsCount] = useImmer(0);
@@ -57,9 +54,8 @@ export default () => {
               // 对地址数组中的每一个链接进行检查,如果不符合规范报错提示,成功添加下载任务后跳转回下载页面
               if (urls.every((i) => isURL(i))) {
                 // 允许提交
-                urls.forEach((url, idx) => {
-                  ws.send(addUri(url));
-                });
+                // @ts-ignore
+                client.addUri(urls);
                 navigate("/downloading");
               } else {
                 Toast.info({

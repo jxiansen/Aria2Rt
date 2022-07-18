@@ -3,7 +3,6 @@ import {
   IconDownload,
   IconUpload,
 } from "@douyinfe/semi-icons/lib/es/icons";
-import "./../index.css";
 import { Space, Button, Modal, Form } from "@douyinfe/semi-ui";
 import { useImmer } from "use-immer";
 import store from "./../store";

@@ -74,7 +74,7 @@ export default () => {
     },
     {
       title: "进度",
-      dataIndex: "files2",
+      dataIndex: "progress",
       // text参数是数据源，record是数组中的一个纪录,index是索引
       render: (data: any, record: any, index: number) => {
         const [completed, all] = [+record.completedLength, +record.totalLength];

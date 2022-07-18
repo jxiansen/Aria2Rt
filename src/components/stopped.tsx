@@ -4,9 +4,10 @@ import { divide, floor } from "lodash";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { getNameFromFiles } from "./../tool";
-import { useInterval } from "ahooks";
+import { useInterval, useRequest } from "ahooks";
 import { useImmer } from "use-immer";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import client from "../client";
 
 export default function App() {
   const [isLoading, setLoading] = useImmer(true);
@@ -14,16 +15,40 @@ export default function App() {
   const [dataSource, setDataSource] = useImmer<any[]>([]);
   const navigate = useNavigate();
 
-  // 每隔2秒获取一次数据
-  useInterval(() => {
-    ws.send(tellStopped);
-  }, 1000);
-
-  // 当有数据传递过来的时候,设置存入本地state并设置加载成功
-  ws.addEventListener("message", (e) => {
-    setDataSource(JSON.parse(e?.data).result);
-    setLoading(false);
+  async function getStop() {
+    const ready = await client.readyPromise;
+    // @ts-ignore
+    return await ready.tellStopped(-1, 1000, [
+      "gid",
+      "totalLength",
+      "completedLength",
+      "uploadSpeed",
+      "downloadSpeed",
+      "connections",
+      "numSeeders",
+      "seeder",
+      "status",
+      "errorCode",
+      "verifiedLength",
+      "verifyIntegrityPending",
+      "files",
+      "bittorrent",
+      "infoHash",
+    ]);
+  }
+  const { data, error, loading } = useRequest(getStop, {
+    pollingInterval: 2000,
   });
+
+  useEffect(() => {
+    console.log(data);
+    if (data && data.length) {
+      setDataSource(data);
+    }
+    if (loading) {
+      setLoading(false);
+    }
+  }, [data]);
 
   const columns = [
     {

@@ -1,15 +1,21 @@
-import { Tabs, TabPane, Table } from "@douyinfe/semi-ui";
+import { Tabs, TabPane, Table, Tree } from "@douyinfe/semi-ui";
 import { HeatMapGrid } from "react-grid-heatmap";
-import { convert } from "./../tool";
-import { useInterval, useMount, useRequest } from "ahooks";
+import {
+  convert,
+  convertArrToTree,
+  formatSeconds,
+  getNameFromFiles,
+  sizeTostr,
+} from "./../tool";
+import { useRequest } from "ahooks";
 import { useParams } from "react-router-dom";
-import { useEffect, useMemo } from "react";
-import { IconMore } from "@douyinfe/semi-icons";
+import { useEffect, useState } from "react";
 import client from "../client";
 import { useImmer } from "use-immer";
 
 export default () => {
   let { gid } = useParams();
+  const [isTorrent, setTorrentStatus] = useState(false);
   async function getDetails() {
     const ready = await client.readyPromise;
     // @ts-ignore
@@ -20,173 +26,191 @@ export default () => {
     pollingInterval: 1000,
   });
 
+  // 每次数据文件信息更新后重新设置数据流
   useEffect(() => {
     if (data) {
-      console.log(data);
+      if (data.bittorrent) {
+        setTorrentStatus(true);
+        // @ts-ignore
+        setTreeData(convertArrToTree(data.files));
+      }
     }
   }, [data]);
-  const columns = [
-    {
-      dataIndex: "name",
-    },
-    {
-      dataIndex: "value",
-    },
-  ];
+
   const tableData = [
     {
-      key: "1",
+      key: "0",
       name: "任务名称",
-      value: 123,
+      value: (() => (data ? getNameFromFiles(data.files[0]) : ""))(),
     },
     {
-      key: "2",
+      key: "1",
       name: "任务大小",
-      value: "2M",
-    },
-    {
-      key: "3",
-      name: "任务状态",
-      value: "2M",
-    },
-    {
-      key: "4",
-      name: "进度",
-      value: "2M",
-    },
-    {
-      key: "5",
-      name: "下载",
-      value: "2M",
-    },
-    {
-      key: "6",
-      name: "上传",
-      value: "2M",
-    },
-    {
-      key: "7",
-      name: "分享率",
-      value: "2M",
-    },
-    {
-      key: "8",
-      name: "剩余时间",
-      value: "2M",
-    },
-    {
-      key: "9",
-      name: "种子数/连接数",
-      value: "2M",
-    },
-    {
-      key: "10",
-      name: "特征值",
       value: (() => {
-        return data ? data.dir : "";
+        if (data) {
+          const value =
+            sizeTostr(data.totalLength) + " (" + data.files.length + "个文件)";
+          return value;
+        }
+        return "";
       })(),
     },
     {
-      key: "11",
+      key: "2",
+      name: "任务状态",
+      value: (() => {
+        if (data) {
+          return data.status === "active" ? "正在下载" : "暂停";
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "3",
+      name: "进度",
+      value: (() => {
+        if (data) {
+          return (
+            ((data.completedLength / data.totalLength) * 100).toFixed(2) + "%"
+          );
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "4",
+      name: "下载",
+      value: (() => {
+        if (data) {
+          return sizeTostr(data.completedLength);
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "5",
+      name: "上传",
+      value: (() => {
+        if (data) {
+          return sizeTostr(data.uploadLength);
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "6",
+      name: "剩余时间",
+      value: (() => {
+        if (data) {
+          return formatSeconds(data.downloadSpeed, data.totalLength);
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "7",
       name: "下载路径",
       value: (() => {
         return data ? data.dir : "";
       })(),
     },
     {
-      key: "12",
+      key: "8",
+      name: "特征值",
+      value: (() => {
+        if (data) {
+          return data.infoHash;
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "9",
+      name: "种子数/连接数",
+      value: (() => {
+        if (data) {
+          return data.numSeeders + "/" + data.connections;
+        }
+        return "";
+      })(),
+    },
+    {
+      key: "10",
       name: "BT服务器",
       value: (() => {
-        return data ? data.dir : "";
+        try {
+          if (data && data.bittorrent.announceList.length) {
+            return data.bittorrent.announceList.reduce(
+              (acc: string, cur: string) => acc + " | " + cur
+            );
+          }
+        } catch (err) {
+          return "";
+        }
       })(),
     },
   ];
+  // 如果是种子连接则删除多余的字段
+  if (!isTorrent) {
+    tableData.length = 8;
+  }
 
-  // function dataToTable(data: object) {
-  //   let tableData = [];
-  //   for (let key in data) {
-  //     if(key )
-  //   }
-  // }
+  const columns = [
+    {
+      title: "标题",
+      dataIndex: "name",
+      fixed: "left",
+      width: 100,
+      align: "left",
+    },
+    {
+      title: "大小",
+      dataIndex: "value",
+      fixed: "left",
+      width: 100,
+      align: "left",
+    },
+  ];
+
+  // 文件列表树形结构初始值
+  const [treeData, setTreeData] = useImmer({
+    Node1: {
+      "Child Node1": "0-0-1",
+      "Child Node2": "0-0-2",
+    },
+    Node2: "0-1",
+  });
 
   return (
-    <div>
-      <Tabs type="line">
-        <TabPane tab="总览" itemKey="1">
-          <Table columns={columns} dataSource={tableData} pagination={false} />;
-        </TabPane>
-        <TabPane tab="区块信息" itemKey="2">
-          <div style={{ margin: "40px 0 0 50px" }}>
-            <HeatMapGrid
-              // @ts-ignore
-              data={data === undefined ? [] : convert(data.bitfield)}
-              cellStyle={(_x, _y, ratio) => ({
-                background: `rgb(12, 160, 44, ${ratio})`,
-                fontSize: ".8rem",
-                color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
-              })}
-              cellHeight="12px"
-              square
-            />
-          </div>
-        </TabPane>
-        <TabPane tab="文件列表" itemKey="3">
-          <h3>帮助</h3>
-          <p
-            style={{
-              lineHeight: 1.8,
-              color: "var(--semi-color-text-0)",
-              fontWeight: 600,
-            }}
-          >
-            Q：有新组件需求、或者现有组件feature不能满足业务需求？
-          </p>
-          <p style={{ lineHeight: 1.8, color: "var(--semi-color-text-1)" }}>
-            右上角问题反馈，提交issue，label选择Feature Request / New Component
-            Request 我们会高优处理这些需求。
-          </p>
-          <p
-            style={{
-              lineHeight: 1.8,
-              color: "var(--semi-color-text-0)",
-              fontWeight: 600,
-            }}
-          >
-            Q：对组件的使用有疑惑？
-          </p>
-          <p style={{ lineHeight: 1.8, color: "var(--semi-color-text-1)" }}>
-            欢迎进我们的客服lark群进行咨询提问。
-          </p>
-        </TabPane>
-        <TabPane tab="连接状态" itemKey="4">
-          <h3>帮助</h3>
-          <p
-            style={{
-              lineHeight: 1.8,
-              color: "var(--semi-color-text-0)",
-              fontWeight: 600,
-            }}
-          >
-            Q：有新组件需求、或者现有组件feature不能满足业务需求？
-          </p>
-          <p style={{ lineHeight: 1.8, color: "var(--semi-color-text-1)" }}>
-            右上角问题反馈，提交issue，label选择Feature Request / New Component
-            Request 我们会高优处理这些需求。
-          </p>
-          <p
-            style={{
-              lineHeight: 1.8,
-              color: "var(--semi-color-text-0)",
-              fontWeight: 600,
-            }}
-          >
-            Q：对组件的使用有疑惑？
-          </p>
-          <p style={{ lineHeight: 1.8, color: "var(--semi-color-text-1)" }}>
-            欢迎进我们的客服lark群进行咨询提问。
-          </p>
-        </TabPane>
-      </Tabs>
-    </div>
+    <Tabs type="line">
+      <TabPane tab="总览" itemKey="1">
+        <Table
+          dataSource={tableData}
+          // @ts-ignore
+          columns={columns}
+          pagination={false}
+          showHeader={false}
+          bordered={false}
+        />
+      </TabPane>
+      <TabPane tab="区块信息" itemKey="2">
+        <div style={{ margin: "40px 0 0 50px" }}>
+          <HeatMapGrid
+            // @ts-ignore
+            data={data === undefined ? [] : convert(data.bitfield)}
+            cellStyle={(_x, _y, ratio) => ({
+              background: `rgb(12, 160, 44, ${ratio})`,
+              fontSize: ".8rem",
+              color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
+            })}
+            cellHeight="12px"
+            square
+          />
+        </div>
+      </TabPane>
+      <TabPane tab="文件列表" itemKey="3">
+        <Tree searchRender={false} treeDataSimpleJson={treeData} />
+      </TabPane>
+    </Tabs>
   );
 };

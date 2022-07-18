@@ -1,24 +1,52 @@
 import { Progress, Tooltip, Table } from "@douyinfe/semi-ui";
-import { useInterval, useMount } from "ahooks";
+import { useRequest, useTimeout } from "ahooks";
 import { floor, divide } from "lodash";
 import { getNameFromFiles, sizeTostr } from "../tool";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { useImmer } from "use-immer";
+import client from "../client";
+import { useEffect } from "react";
 
 export default () => {
   const [dataSource, setDataSource] = useImmer<any[]>([]);
   const [isLoading, setLoading] = useImmer(true);
-
   const navigate = useNavigate();
-
-  useInterval(() => {
-    ws.send(tellWaiting);
-  }, 10);
-  ws.addEventListener("message", (e) => {
-    setDataSource(JSON.parse(e?.data).result);
-    setLoading(false);
+  // =============================
+  async function getWaiting() {
+    const ready = await client.readyPromise;
+    // @ts-ignore
+    return await ready.tellWaiting(0, 1000, [
+      "gid",
+      "totalLength",
+      "completedLength",
+      "uploadSpeed",
+      "downloadSpeed",
+      "connections",
+      "numSeeders",
+      "seeder",
+      "status",
+      "errorCode",
+      "verifiedLength",
+      "verifyIntegrityPending",
+      "files",
+      "bittorrent",
+      "infoHash",
+    ]);
+  }
+  const { data, error, loading } = useRequest(getWaiting, {
+    pollingInterval: 2000,
   });
+
+  useEffect(() => {
+    console.log(data);
+    if (data && data.length) {
+      setDataSource(data);
+    }
+    if (loading) {
+      setLoading(false);
+    }
+  }, [data]);
 
   const columns = [
     {

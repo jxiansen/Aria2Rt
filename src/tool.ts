@@ -1,5 +1,6 @@
-import { chunk } from "lodash";
-
+import { useWebSocket } from "ahooks";
+import { chunk, set, get, invert, assign } from "lodash";
+import React, { useState, useEffect, useCallback } from "react";
 /**
  * 网速转换,将BPS转换为适当的维度单位
  * @param {string}
@@ -73,3 +74,84 @@ export const convert = (char: string) => {
   // 每一个元素都是一横,从下往上，从左往右最后二维数组需要翻转一下
   return chunk([...res], 90);
 };
+
+/**
+ * 从files对象中获得文件名
+ */
+export function getNameFromFiles(files: object[]) {
+  try {
+    // @ts-ignore
+    if (files.path.length) {
+      // @ts-ignore
+      return files.path.replace("/root/downloads/", "");
+    }
+    // @ts-ignore
+    const url = files.uris[0].uri;
+    if (url.length) {
+      const arr = url.split("/");
+      return arr.pop();
+    }
+  } catch (err) {
+    console.log(`解析文件名出错`);
+    return "错误名";
+  }
+}
+
+// 将数组的扁平结构转换成树状结构,返回对象
+export function convertArrToTree(arr: any) {
+  const obj = {};
+  let id = 0;
+  let prePath;
+  for (let item of arr) {
+    const per = ((item.completedLength / item.length) * 100).toFixed(2);
+    const size = sizeTostr(item.length);
+    const temp = item.path.split("/").splice(4);
+    const fileName = temp.pop();
+    const path = temp.join(".");
+    if (path !== prePath) {
+      id = 0;
+    }
+    let newPath = path + "." + id;
+    if (!path.length) {
+      // @ts-ignore
+      newPath = id;
+    }
+    set(
+      obj,
+      newPath,
+      `文件名：${
+        fileName ? fileName : item.path.split("/").reverse()[0]
+      }\xa0\xa0\xa0\xa0\xa0\xa0进度：${per}%\xa0\xa0\xa0\xa0\xa0\xa0文件大小：${size}`
+    );
+    id++;
+    prePath = path;
+  }
+  return getTreeData(obj);
+}
+
+// 遍历对象数的所有叶子节点并调换键值顺序
+function getTreeData(obj: object) {
+  const pathArr: string[] = [];
+  for (let key in obj) {
+    const newPathArr = [...pathArr, key];
+    // 当前键对应的值
+    let val = get(obj, newPathArr);
+    // 如果是数字就调换 key-val值
+    // @ts-ignore
+    if (!isNaN(key)) {
+      // @ts-ignore
+      obj[val] = key;
+      // @ts-ignore
+      delete obj[key];
+      continue;
+    }
+    // 如果是数组就遍历
+    if (Array.isArray(val)) {
+      set(obj, newPathArr, invert(assign({}, val)));
+      continue;
+    }
+    // 如果是对象就继续递归执行
+    getTreeData(val);
+  }
+  return obj;
+}
