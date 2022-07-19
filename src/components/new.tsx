@@ -7,7 +7,7 @@ import {
   Toast,
 } from "@douyinfe/semi-ui";
 // @ts-ignore
-import { isURL } from "validator";
+import { isURL, isMagnetURI } from "validator";
 import { Typography } from "@douyinfe/semi-ui";
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
@@ -41,7 +41,7 @@ export default () => {
             rows={10}
             showClear
             style={{ border: "rgba(var(--semi-grey-9), .08)" }}
-            placeholder="支持多个URL地址,每个地址回车占一行"
+            placeholder="支持多个URL地址,每个地址回车占一行,支持 url 和 磁力链接"
             onChange={(val) => {
               setLinks(val);
             }}
@@ -52,7 +52,7 @@ export default () => {
             style={{ marginTop: 28 }}
             onClick={() => {
               // 对地址数组中的每一个链接进行检查,如果不符合规范报错提示,成功添加下载任务后跳转回下载页面
-              if (urls.every((i) => isURL(i))) {
+              if (urls.every((i) => isURL(i) || isMagnetURI(i))) {
                 // 允许提交
                 // @ts-ignore
                 client.addUri(urls);

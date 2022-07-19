@@ -1,4 +1,4 @@
-import { Avatar, Button, Nav, Input, Divider } from "@douyinfe/semi-ui";
+import { Button, Nav, Input, Divider } from "@douyinfe/semi-ui";
 import {
   IconPlus,
   IconPlay,
@@ -8,7 +8,6 @@ import {
   IconDelete,
   IconGridView,
   IconMoon,
-  IconSort,
   IconShrinkScreenStroked,
   IconGithubLogo,
   IconFullScreenStroked,
@@ -80,15 +79,7 @@ export default () => {
               color: "var(--semi-color-text-2)",
             }}
           />
-          <Button
-            theme="borderless"
-            icon={<IconSort />}
-            style={{
-              color: "var(--semi-color-text-2)",
-            }}
-          />
           <Divider layout="vertical" margin="8px" />
-
           <Button
             onClick={() => {
               window.location.href = "https://github.com/jxiansen/Aria2Rt";

@@ -42,49 +42,45 @@ export default () => {
             : "已完成/已经停止",
           icon: <IconTickCircle size="large" />,
         },
+
         {
-          itemKey: "settings/ui",
-          text: "界面设置",
-          icon: <IconDuration size="large" />,
-        },
-        {
-          itemKey: "settings/aria2",
+          itemKey: "settings",
           text: "Aria2设置",
           icon: <IconSetting size="large" />,
-          items: [
-            {
-              itemKey: "settings/aria2/basic",
-              text: "基本设置",
-            },
-            {
-              itemKey: "settings/aria2/http-ftp-sftp",
-              text: "HTTP/FTP/SFTP设置",
-            },
-            {
-              itemKey: "settings/aria2/http",
-              text: "HTTP设置",
-            },
-            {
-              itemKey: "settings/aria2/ftp-sftp",
-              text: "FTP/SFTP设置",
-            },
-            {
-              itemKey: "settings/aria2/bt",
-              text: "BitTorrent 设置",
-            },
-            {
-              itemKey: "settings/aria2/metalink",
-              text: "Metalink 设置",
-            },
-            {
-              itemKey: "settings/aria2/rpc",
-              text: "RPC 设置",
-            },
-            {
-              itemKey: "settings/aria2/advanced",
-              text: "高级 设置",
-            },
-          ],
+          // items: [
+          //   {
+          //     itemKey: "settings/aria2/basic",
+          //     text: "基本设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/http-ftp-sftp",
+          //     text: "HTTP/FTP/SFTP设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/http",
+          //     text: "HTTP设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/ftp-sftp",
+          //     text: "FTP/SFTP设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/bt",
+          //     text: "BitTorrent 设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/metalink",
+          //     text: "Metalink 设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/rpc",
+          //     text: "RPC 设置",
+          //   },
+          //   {
+          //     itemKey: "settings/aria2/advanced",
+          //     text: "高级 设置",
+          //   },
+          // ],
         },
         {
           itemKey: "status",
