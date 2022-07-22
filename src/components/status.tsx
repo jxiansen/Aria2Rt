@@ -28,8 +28,6 @@ const style = {
 export default () => {
   const [visible, setVisible] = useState(false);
   const { data, error, loading } = useRequest(getVersion);
-  console.log(data);
-  console.log(client.url);
   if (loading) {
     return <h1>加载中</h1>;
   }

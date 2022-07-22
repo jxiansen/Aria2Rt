@@ -94,7 +94,7 @@ export default () => {
   return (
     <Form
       labelPosition="left"
-      labelWidth="750px"
+      labelWidth="450px"
       labelAlign="left"
       style={{ padding: "10px", width: "80%" }}
       onValueChange={(val) => {
@@ -126,10 +126,6 @@ export default () => {
             rules={[
               { required: true, message: "内容不能为空" },
               { type: "string", message: "类型错误" },
-              // {
-              //   validator: (rule, value) => value === "semi",
-              //   message: "内容应该和初始值一样",
-              // },
             ]}
           />
         );

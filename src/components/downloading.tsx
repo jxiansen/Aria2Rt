@@ -1,18 +1,17 @@
 import { Table, Progress, Tooltip } from "@douyinfe/semi-ui";
-import * as dateFns from "date-fns";
-import {
-  sizeTostr,
-  convertSpeed,
-  formatSeconds,
-  getNameFromFiles,
-} from "./../tool";
 import { divide, floor } from "lodash";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { useRequest } from "ahooks";
 import client from "../client";
 import { useEffect } from "react";
-import { useImmer } from "use-immer";
+import store from "../store";
+import {
+  sizeTostr,
+  convertSpeed,
+  formatSeconds,
+  getNameFromFiles,
+} from "./../tool";
 
 async function getActive() {
   const ready = await client.readyPromise;
@@ -34,20 +33,28 @@ async function getActive() {
   ]);
 }
 
+const rowSelection = {
+  onSelectAll: (selected: boolean) => {
+    if (selected) {
+      store.selectedAll = true;
+    }
+  },
+  onSelect: (record: any, selected: boolean) => {
+    const { curGid } = store;
+    if (selected) {
+      // @ts-ignore
+      curGid.push(record.gid);
+    }
+  },
+};
+
 export default () => {
+  const navigate = useNavigate();
   const { data, error, loading } = useRequest(getActive, {
     pollingInterval: 1000,
   });
 
-  const [files, setFiles] = useImmer([]);
-  useEffect(() => {
-    if (data) {
-      setFiles(data.files);
-    }
-    console.log(data);
-  }, [data]);
-
-  const navigate = useNavigate();
+  useEffect(() => {}, [data]);
 
   const columns = [
     {
@@ -68,6 +75,7 @@ export default () => {
     {
       title: "总大小",
       dataIndex: "totalLength",
+      sorter: (a: any, b: any) => (a.size - b.size > 0 ? 1 : -1),
       render: (size: string) => {
         return <div>{sizeTostr(size)}</div>;
       },
@@ -75,6 +83,11 @@ export default () => {
     {
       title: "进度",
       dataIndex: "progress",
+      sorter: (a: any, b: any) =>
+        a.completedLength / a.totalLength - b.completedLength / b.totalLength >
+        0
+          ? 1
+          : -1,
       // text参数是数据源，record是数组中的一个纪录,index是索引
       render: (data: any, record: any, index: number) => {
         const [completed, all] = [+record.completedLength, +record.totalLength];
@@ -93,6 +106,10 @@ export default () => {
     {
       title: "剩余时间",
       dataIndex: "remainTime",
+      sorter: (a: any, b: any) =>
+        a.downloadSpeed / a.totalLength - b.downloadSpeed / b.totalLength > 0
+          ? 1
+          : -1,
       render: (data: any, record: any, index: number) => {
         return formatSeconds(record.downloadSpeed, record.totalLength);
       },
@@ -100,6 +117,7 @@ export default () => {
     {
       title: "下载速度",
       dataIndex: "downloadSpeed",
+      sorter: (a: any, b: any) => (a.speed - b.speed > 0 ? 1 : -1),
       render: (speed: string, record: any) => {
         return (
           <div
@@ -150,9 +168,12 @@ export default () => {
     <Table
       columns={columns}
       dataSource={data}
+      rowKey="gid" // 为表格中的每一行指定一个key
       pagination={false}
       // @ts-ignore
       onRow={handleRow}
+      // @ts-ignore
+      rowSelection={rowSelection}
     />
   );
 };

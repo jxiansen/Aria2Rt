@@ -1,18 +1,17 @@
-import { Table, Progress, Tooltip } from "@douyinfe/semi-ui";
+import { Table, Progress, Tooltip, Button, Toast } from "@douyinfe/semi-ui";
 import { sizeTostr } from "./../tool";
 import { divide, floor } from "lodash";
-import { IconChevronRight } from "@douyinfe/semi-icons";
+import { IconChevronRight, IconDelete } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { getNameFromFiles } from "./../tool";
-import { useInterval, useRequest } from "ahooks";
+import { useRequest } from "ahooks";
 import { useImmer } from "use-immer";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import client from "../client";
 
 export default function App() {
   const [isLoading, setLoading] = useImmer(true);
   // 所有已经完成的任务数据存储
-  const [dataSource, setDataSource] = useImmer<any[]>([]);
   const navigate = useNavigate();
 
   async function getStop() {
@@ -37,14 +36,10 @@ export default function App() {
     ]);
   }
   const { data, error, loading } = useRequest(getStop, {
-    pollingInterval: 2000,
+    pollingInterval: 1000,
   });
 
   useEffect(() => {
-    console.log(data);
-    if (data && data.length) {
-      setDataSource(data);
-    }
     if (loading) {
       setLoading(false);
     }
@@ -112,6 +107,30 @@ export default function App() {
         );
       },
     },
+    {
+      title: "删除纪录",
+      dataIndex: "delete",
+      render: (data: string, record: any) => {
+        return (
+          <Button
+            theme="borderless"
+            type="primary"
+            onClick={async () => {
+              // 删除当前的纪录
+              const ready = await client.readyPromise;
+              // @ts-ignore
+              ready.removeDownloadResult(record.gid);
+              Toast.info({
+                content: "删除任务成功啦",
+                duration: 1,
+              });
+            }}
+          >
+            <IconDelete />
+          </Button>
+        );
+      },
+    },
   ];
 
   const handleRow = (record: any, index: any) => {
@@ -125,13 +144,11 @@ export default function App() {
     }
   };
 
-  const scroll = useMemo(() => ({ y: 800 }), []);
-
   return (
     <>
       <Table
         columns={columns}
-        dataSource={dataSource}
+        dataSource={data}
         pagination={false}
         // @ts-ignore
         onRow={handleRow}

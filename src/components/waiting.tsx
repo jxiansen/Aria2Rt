@@ -1,5 +1,5 @@
 import { Progress, Tooltip, Table } from "@douyinfe/semi-ui";
-import { useRequest, useTimeout } from "ahooks";
+import { useRequest } from "ahooks";
 import { floor, divide } from "lodash";
 import { getNameFromFiles, sizeTostr } from "../tool";
 import { IconChevronRight } from "@douyinfe/semi-icons";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useImmer } from "use-immer";
 import client from "../client";
 import { useEffect } from "react";
+import store from "../store";
 
 export default () => {
   const [dataSource, setDataSource] = useImmer<any[]>([]);
@@ -35,11 +36,10 @@ export default () => {
     ]);
   }
   const { data, error, loading } = useRequest(getWaiting, {
-    pollingInterval: 2000,
+    pollingInterval: 1000,
   });
 
   useEffect(() => {
-    console.log(data);
     if (data && data.length) {
       setDataSource(data);
     }
@@ -48,6 +48,20 @@ export default () => {
     }
   }, [data]);
 
+  const rowSelection = {
+    onSelectAll: (selected: boolean) => {
+      if (selected) {
+        // @ts-ignore
+        store.selectedAll = true;
+      }
+    },
+    onSelect: (record: any, selected: boolean) => {
+      if (selected) {
+        // @ts-ignore
+        store.curGid.push(record.gid);
+      }
+    },
+  };
   const columns = [
     {
       title: "文件名",
@@ -134,7 +148,10 @@ export default () => {
       pagination={false}
       // @ts-ignore
       onRow={handleRow}
+      rowKey="gid"
       loading={isLoading}
+      // @ts-ignore
+      rowSelection={rowSelection}
     />
   );
 };

@@ -1,19 +1,20 @@
 import {
   Button,
-  Dropdown,
   TabPane,
   Tabs,
   TextArea,
   Toast,
+  Upload,
 } from "@douyinfe/semi-ui";
 // @ts-ignore
 import { isURL, isMagnetURI } from "validator";
 import { Typography } from "@douyinfe/semi-ui";
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
-import { IconFolder } from "@douyinfe/semi-icons";
+import { IconBolt } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import client from "../client";
+
 export default () => {
   const { Text } = Typography;
   const [rowsCount, setRowsCount] = useImmer(0);
@@ -27,6 +28,31 @@ export default () => {
     // @ts-ignore
     setUrls(links.split("\n").filter((i) => !!i));
   }, [links]);
+
+  const handleFileChange = (file: File) => {
+    // 读取File对象中的文件
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = async function () {
+      // @ts-ignore
+      let base64 = reader.result.split("base64,")[1];
+      const ready = await client.readyPromise;
+      // @ts-ignore
+      ready.addTorrent(base64);
+      Toast.info({
+        content: "添加种子下载成功",
+        duration: 1,
+      });
+      setTimeout(() => {
+        navigate("/downloading");
+      }, 1000);
+    };
+
+    reader.onerror = function () {
+      console.log(reader.error);
+    };
+  };
 
   return (
     <div>
@@ -68,26 +94,21 @@ export default () => {
             立即下载
           </Button>
         </TabPane>
-        <TabPane tab="选项" itemKey="2">
-          <h3>快速起步</h3>
+
+        <TabPane tab="种子下载" itemKey="2">
+          <Upload
+            action="#"
+            dragIcon={<IconBolt />}
+            draggable={true}
+            onFileChange={(Array) => {
+              handleFileChange(Array[0]);
+            }}
+            showUploadList={false}
+            dragMainText={"点击上传文件或拖拽文件到这里"}
+            dragSubText="仅支持 .torrent 种子文件"
+            style={{ marginTop: 10 }}
+          ></Upload>
         </TabPane>
-        <TabPane
-          tab={
-            <Dropdown
-              trigger={"click"}
-              position={"bottomRight"}
-              render={
-                <Dropdown.Menu>
-                  <Dropdown.Item>打开种子文件</Dropdown.Item>
-                  <Dropdown.Item>Menu Item 3</Dropdown.Item>
-                </Dropdown.Menu>
-              }
-            >
-              <IconFolder />
-            </Dropdown>
-          }
-          itemKey="3"
-        />
       </Tabs>
     </div>
   );

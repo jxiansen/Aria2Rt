@@ -3,7 +3,7 @@ import FooterContent from "./footer";
 import HeaderContent from "./header";
 import SiderContent from "./sider";
 import { Outlet } from "react-router-dom";
-import { useMount, useRequest } from "ahooks";
+import { useRequest } from "ahooks";
 import store from "./../store";
 import client from "../client";
 import { useEffect } from "react";
@@ -21,20 +21,20 @@ export default () => {
   });
 
   // 从store中解构出client实列和全局状态
-  useMount(() => {
+  useEffect(() => {
     if (error) {
       Notification.error({
-        content: "connect fail",
+        content: "连接服务器失败",
         duration: 0,
       });
     } else {
       Notification.success({
         title: "Hi, Guys",
-        content: "You have connected the Server",
+        content: "成功连接服务器啦了😘",
         duration: 1.5,
       });
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (data) {

@@ -14,7 +14,6 @@ class Client {
     this.id = 1;
     // 监听发送消息事件,将事件中的数据解析出来
     this.ws.onmessage = (e) => {
-      console.log("收到消息");
       try {
         const data = JSON.parse(e.data);
         const id = data.id;

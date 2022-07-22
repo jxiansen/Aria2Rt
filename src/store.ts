@@ -11,6 +11,8 @@ const store = resso({
     uploadSpeed: "0",
   },
   active: [],
+  curGid: [], // 当前选中的gid 任务编号
+  selectedAll: false, // 是否选中所有的任务
 });
 
 export default store;
