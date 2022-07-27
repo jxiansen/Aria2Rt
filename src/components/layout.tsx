@@ -7,6 +7,7 @@ import { useRequest } from "ahooks";
 import store from "./../store";
 import client from "../client";
 import { useEffect } from "react";
+import { solveBugs } from "../tool";
 
 async function getInfo() {
   const ready = await client.readyPromise;
@@ -41,6 +42,11 @@ export default () => {
       store.globalState = data;
     }
   }, [data]);
+
+  useEffect(() => {
+    solveBugs();
+  }, []);
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider style={{ backgroundColor: "var(--semi-color-bg-1)" }}>
