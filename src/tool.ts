@@ -1,6 +1,8 @@
-import { useWebSocket } from "ahooks";
-import { chunk, set, get, invert, assign } from "lodash";
-import React, { useState, useEffect, useCallback } from "react";
+import chunk from "lodash/chunk";
+import set from "lodash/set";
+import get from "lodash/get";
+import invert from "lodash/invert";
+import assign from "lodash/assign";
 /**
  * 网速转换,将BPS转换为适当的维度单位
  * @param {string}

@@ -1,6 +1,7 @@
 import { Progress, Tooltip, Table } from "@douyinfe/semi-ui";
 import { useRequest } from "ahooks";
-import { floor, divide } from "lodash";
+import floor from "lodash/floor";
+import divide from "lodash/divide";
 import { getNameFromFiles, sizeTostr } from "../tool";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
