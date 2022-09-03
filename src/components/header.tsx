@@ -1,20 +1,25 @@
-import { Button, Nav, Input, Divider, Tooltip } from "@douyinfe/semi-ui";
+import {
+  Button,
+  Nav,
+  Divider,
+  Typography,
+  Tooltip,
+  Notification,
+} from "@douyinfe/semi-ui";
 import {
   IconPlus,
   IconPlay,
   IconPause,
-  IconSearch,
   IconSun,
   IconDelete,
-  IconGridView,
   IconMoon,
   IconShrinkScreenStroked,
   IconGithubLogo,
   IconFullScreenStroked,
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
-import { useFullscreen } from "ahooks";
+import { useEffect, useRef } from "react";
+import { useFullscreen, useMount } from "ahooks";
 import { useImmer } from "use-immer";
 import store from "../store";
 import client from "../client";
@@ -26,6 +31,7 @@ export default () => {
   const [isFullscreen, { toggleFullscreen }] = useFullscreen(ref);
   const [isDarkMode, setDarkMode] = useImmer(false);
   const { curGid, selectedAll } = store;
+
   const switchMode = () => {
     setDarkMode(!isDarkMode);
     const body = document.body;
@@ -154,7 +160,6 @@ export default () => {
             }}
           />
         )}
-
         {isFullscreen ? (
           <Button
             theme="borderless"
@@ -176,8 +181,36 @@ export default () => {
             }}
           />
         )}
-        <Input size="large" defaultValue="搜索" suffix={<IconSearch />}></Input>
+        <Button
+          onClick={() => {
+            Notification.open({
+              title: "使用说明😀",
+              content: <NotificationContent />,
+              duration: 3,
+            });
+          }}
+        >
+          戳我哦(⊙o⊙)
+        </Button>
       </Nav.Footer>
     </Nav>
   );
 };
+
+function NotificationContent() {
+  const { Paragraph, Title, Text } = Typography;
+  return (
+    <div>
+      <Text>本工具可以用来下载图片,http,ftp,磁力链接,种子文件</Text>
+      <br />
+      <Text>内核调用的aria2可以说是最强大的下载工具了</Text>
+      <br />
+      <a href="https://www.ygdy8.com/">
+        <Text>种子资源下载</Text>
+      </a>
+      <a href="http://81.68.209.144:3000" style={{ marginLeft: "20px" }}>
+        <Text>查看下载文件</Text>
+      </a>
+    </div>
+  );
+}

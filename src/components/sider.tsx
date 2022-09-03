@@ -1,6 +1,5 @@
-import { Badge, Collapse, Nav } from "@douyinfe/semi-ui";
+import { Nav } from "@douyinfe/semi-ui";
 import {
-  IconDuration,
   IconServer,
   IconTickCircle,
   IconDownload,
