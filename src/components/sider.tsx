@@ -5,6 +5,7 @@ import {
   IconDownload,
   IconSetting,
   IconClock,
+  IconPulse,
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { useImmer } from "use-immer";
@@ -30,6 +31,11 @@ export default () => {
           icon: <IconDownload size="large" />,
         },
         {
+          itemKey: "dashboard",
+          text: "监控",
+          icon: <IconPulse size="large" />,
+        },
+        {
           itemKey: "waiting",
           text: +numWaiting ? `正在等待(${numWaiting})` : "正在等待",
           icon: <IconClock size="large" />,
@@ -46,40 +52,6 @@ export default () => {
           itemKey: "settings",
           text: "Aria2设置",
           icon: <IconSetting size="large" />,
-          // items: [
-          //   {
-          //     itemKey: "settings/aria2/basic",
-          //     text: "基本设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/http-ftp-sftp",
-          //     text: "HTTP/FTP/SFTP设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/http",
-          //     text: "HTTP设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/ftp-sftp",
-          //     text: "FTP/SFTP设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/bt",
-          //     text: "BitTorrent 设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/metalink",
-          //     text: "Metalink 设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/rpc",
-          //     text: "RPC 设置",
-          //   },
-          //   {
-          //     itemKey: "settings/aria2/advanced",
-          //     text: "高级 设置",
-          //   },
-          // ],
         },
         {
           itemKey: "status",

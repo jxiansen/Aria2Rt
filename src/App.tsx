@@ -7,6 +7,7 @@ import Detail from "./components/detail";
 import Waiting from "./components/waiting";
 import Settings from "./components/settings";
 import Status from "./components/status";
+import Charts from "./components/charts";
 
 export default () => {
   return (
@@ -19,6 +20,7 @@ export default () => {
         <Route path="task/detail/:gid" element={<Detail />} />
         <Route path="settings" element={<Settings />} />
         <Route path="status" element={<Status />} />
+        <Route path="dashboard" element={<Charts />} />
       </Route>
       <Route path="*" element={<Navigate replace to="/" />} />
     </Routes>

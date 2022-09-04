@@ -18,8 +18,8 @@ import {
   IconFullScreenStroked,
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
-import { useFullscreen, useMount } from "ahooks";
+import { useRef } from "react";
+import { useFullscreen } from "ahooks";
 import { useImmer } from "use-immer";
 import store from "../store";
 import client from "../client";
