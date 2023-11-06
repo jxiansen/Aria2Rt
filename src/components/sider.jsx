@@ -9,17 +9,15 @@ import {
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { useImmer } from "use-immer";
-import store from "./../store";
 
 export default () => {
   const navigate = useNavigate();
-  const { numActive, numWaiting, numStopped } = store.globalState;
   const [selectedKey, setSelectedKey] = useImmer([]);
+
   return (
     <Nav
       style={{ maxWidth: 220, height: "100%" }}
       onSelect={({ itemKey, selectedKeys, selectedItems, isOpen }) => {
-        // @ts-ignore
         setSelectedKey(selectedKeys);
         navigate(itemKey.toString());
       }}

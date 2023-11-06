@@ -1,24 +1,23 @@
-import { Table, Progress, Tooltip, Button, Toast } from "@douyinfe/semi-ui";
-import { sizeTostr } from "./../tool";
+import { Progress, Tooltip, Table } from "@douyinfe/semi-ui";
+import { useRequest } from "ahooks";
 import floor from "lodash/floor";
 import divide from "lodash/divide";
-import { IconChevronRight, IconDelete } from "@douyinfe/semi-icons";
+import { getNameFromFiles, sizeTostr } from "../utils";
+import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { getNameFromFiles } from "./../tool";
-import { useRequest } from "ahooks";
 import { useImmer } from "use-immer";
+// import client from "../client";
 import { useEffect } from "react";
-import client from "../client";
 
-export default function App() {
+export default () => {
+  const [dataSource, setDataSource] = useImmer([]);
   const [isLoading, setLoading] = useImmer(true);
-  // 所有已经完成的任务数据存储
   const navigate = useNavigate();
 
-  async function getStop() {
+  async function getWaiting() {
     const ready = await client.readyPromise;
-    // @ts-ignore
-    return await ready.tellStopped(-1, 1000, [
+
+    return await ready.tellWaiting(0, 1000, [
       "gid",
       "totalLength",
       "completedLength",
@@ -36,21 +35,34 @@ export default function App() {
       "infoHash",
     ]);
   }
-  const { data, error, loading } = useRequest(getStop, {
-    pollingInterval: 1000,
-  });
+  const { data, error, loading } = useRequest(getWaiting);
 
   useEffect(() => {
+    if (data && data.length) {
+      setDataSource(data);
+    }
     if (loading) {
       setLoading(false);
     }
   }, [data]);
 
+  const rowSelection = {
+    onSelectAll: (selected) => {
+      if (selected) {
+        store.selectedAll = true;
+      }
+    },
+    onSelect: (record, selected) => {
+      if (selected) {
+        store.curGid.push(record.gid);
+      }
+    },
+  };
   const columns = [
     {
       title: "文件名",
       dataIndex: "files",
-      render: (data: any, record: any, index: number) => {
+      render: (data, record, index) => {
         const fileName = getNameFromFiles(record.files[0]);
         return (
           <>
@@ -65,19 +77,18 @@ export default function App() {
     {
       title: "总大小",
       dataIndex: "totalLength",
-      sorter: (a: any, b: any) => (a.totalLength - b.totalLength > 0 ? 1 : -1),
-      render: (size: string) => {
+      sorter: (a, b) => (a.totalLength - b.totalLength > 0 ? 1 : -1),
+      render: (size) => {
         return <div>{sizeTostr(size)}</div>;
       },
     },
     {
       title: "进度",
       dataIndex: "files2",
-      sorter: (a: any, b: any) =>
-        a.completedLength - b.completedLength > 0 ? 1 : -1,
+      sorter: (a, b) => (a.completedLength - b.completedLength > 0 ? 1 : -1),
 
       // text参数是数据源，record是数组中的一个纪录,index是索引
-      render: (data: any, record: any, index: number) => {
+      render: (data, record, index) => {
         const [completed, all] = [+record.completedLength, +record.totalLength];
         let per = completed === 0 ? 0 : floor(divide(completed, all) * 100, 2);
         return (
@@ -95,7 +106,7 @@ export default function App() {
     {
       title: "查看详情",
       dataIndex: "navigate",
-      render: (data: string, record: any) => {
+      render: (data, record) => {
         return (
           <Tooltip content={"点击查看任务详情"} position="left">
             <IconChevronRight
@@ -109,32 +120,13 @@ export default function App() {
       },
     },
     {
-      title: "删除纪录",
-      dataIndex: "delete",
-      render: (data: string, record: any) => {
-        return (
-          <Button
-            theme="borderless"
-            type="primary"
-            onClick={async () => {
-              // 删除当前的纪录
-              const ready = await client.readyPromise;
-              // @ts-ignore
-              ready.removeDownloadResult(record.gid);
-              Toast.info({
-                content: "删除任务成功啦",
-                duration: 1,
-              });
-            }}
-          >
-            <IconDelete />
-          </Button>
-        );
-      },
+      title: "状态",
+      dataIndex: "status",
+      render: () => "已经暂停",
     },
   ];
 
-  const handleRow = (record: any, index: any) => {
+  const handleRow = (record, index) => {
     // 给偶数行设置斑马纹
     if (index % 2 === 0) {
       return {
@@ -144,17 +136,15 @@ export default function App() {
       };
     }
   };
-
   return (
-    <>
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-        // @ts-ignore
-        onRow={handleRow}
-        loading={isLoading}
-      />
-    </>
+    <Table
+      columns={columns}
+      dataSource={dataSource}
+      pagination={false}
+      onRow={handleRow}
+      rowKey="gid"
+      loading={isLoading}
+      rowSelection={rowSelection}
+    />
   );
-}
+};

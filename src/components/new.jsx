@@ -6,14 +6,13 @@ import {
   Toast,
   Upload,
 } from "@douyinfe/semi-ui";
-// @ts-ignore
+
 import { isURL, isMagnetURI } from "validator";
 import { Typography } from "@douyinfe/semi-ui";
 import { useEffect } from "react";
 import { useImmer } from "use-immer";
 import { IconBolt } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import client from "../client";
 
 export default () => {
   const { Text } = Typography;
@@ -25,20 +24,19 @@ export default () => {
   useEffect(() => {
     const count = links.split("\n").length - 1;
     setRowsCount(count);
-    // @ts-ignore
+
     setUrls(links.split("\n").filter((i) => !!i));
   }, [links]);
 
-  const handleFileChange = (file: File) => {
+  const handleFileChange = (file) => {
     // 读取File对象中的文件
     let reader = new FileReader();
     reader.readAsDataURL(file);
 
     reader.onload = async function () {
-      // @ts-ignore
       let base64 = reader.result.split("base64,")[1];
       const ready = await client.readyPromise;
-      // @ts-ignore
+
       ready.addTorrent(base64);
       Toast.info({
         content: "添加种子下载成功",
@@ -80,7 +78,7 @@ export default () => {
               // 对地址数组中的每一个链接进行检查,如果不符合规范报错提示,成功添加下载任务后跳转回下载页面
               if (urls.every((i) => isURL(i) || isMagnetURI(i))) {
                 // 允许提交
-                // @ts-ignore
+
                 client.addUri(urls);
                 navigate("/downloading");
               } else {

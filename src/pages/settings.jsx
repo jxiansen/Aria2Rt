@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { Form, Spin, Toast } from "@douyinfe/semi-ui";
 import { useRequest } from "ahooks";
-import client from "../client";
+// import client from "../client";
 // 导入中文名和原字段翻译映射配置
-import filedMap from "./../transloateConfig.json";
+import filedMap from "@/assets/transloateConfig.json";
 
 // 处理表单数据变化,重新提交
 const handleChange = async (val) => {
@@ -52,8 +51,7 @@ export default () => {
         handleChange(val);
       }}
     >
-      {Object.keys(data).map((key: string, idx) => {
-        // @ts-ignore
+      {Object.keys(data).map((key, idx) => {
         const val = data[key];
         if (val === "true" || val === "false") {
           return (

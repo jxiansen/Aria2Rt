@@ -21,8 +21,6 @@ import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { useFullscreen } from "ahooks";
 import { useImmer } from "use-immer";
-import store from "../store";
-import client from "../client";
 
 export default () => {
   // 将document.body传递给ref,然后使用hooks来设置全屏
@@ -30,7 +28,6 @@ export default () => {
   const navigate = useNavigate();
   const [isFullscreen, { toggleFullscreen }] = useFullscreen(ref);
   const [isDarkMode, setDarkMode] = useImmer(false);
-  const { curGid, selectedAll } = store;
 
   const switchMode = () => {
     setDarkMode(!isDarkMode);
@@ -65,12 +62,12 @@ export default () => {
                 if (curGid.length) {
                   const ready = await client.readyPromise;
                   if (selectedAll) {
-                    // @ts-ignore 恢复所有的任务
+                    恢复所有的任务;
                     ready.unpauseAll();
                     return;
                   }
                   curGid.forEach((gid) => {
-                    // @ts-ignore 恢复指定任务
+                    恢复指定任务;
                     ready.unpause(gid);
                   });
                   curGid.length = 0;
@@ -87,12 +84,11 @@ export default () => {
                 if (curGid.length) {
                   const ready = await client.readyPromise;
                   if (selectedAll) {
-                    // @ts-ignore 暂停所有的任务
+                    暂停所有的任务;
                     ready.forcePauseAll();
                     return;
                   }
                   curGid.forEach((gid) => {
-                    // @ts-ignore
                     ready.forcePause(gid);
                   });
                   curGid.length = 0;
@@ -114,7 +110,6 @@ export default () => {
                 if (curGid.length) {
                   const ready = await client.readyPromise;
                   curGid.forEach((gid) => {
-                    // @ts-ignore
                     ready.forceRemove(gid);
                   });
                   curGid.length = 0;

@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { Line } from "@ant-design/plots";
-import store from "../store";
+
 import { useImmer } from "use-immer";
 
 const DemoLine = () => {
-  const { downloadSpeed, uploadSpeed } = store.globalState;
   const [data, setData] = useImmer([
     {
       time: new Date().toLocaleTimeString(),
@@ -20,14 +19,14 @@ const DemoLine = () => {
   useEffect(() => {
     setData((draft) => {
       draft.push({
-        time: new Date().toLocaleTimeString(),
-        speed: Number(downloadSpeed),
-        category: "下载速度",
+        // time: new Date().toLocaleTimeString(),
+        // speed(downloadSpeed),
+        // category: "下载速度",
       });
       draft.push({
-        time: new Date().toLocaleTimeString(),
-        speed: Number(uploadSpeed),
-        category: "上传速度",
+        // time: new Date().toLocaleTimeString(),
+        // speed(uploadSpeed),
+        // category: "上传速度",
       });
     });
   }, [downloadSpeed, uploadSpeed]);

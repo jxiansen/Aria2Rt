@@ -3,49 +3,26 @@ import FooterContent from "./footer";
 import HeaderContent from "./header";
 import SiderContent from "./sider";
 import { Outlet } from "react-router-dom";
-import { useRequest } from "ahooks";
-import store from "./../store";
-import client from "../client";
+
 import { useEffect } from "react";
-import { solveBugs } from "../tool";
 
-async function getInfo() {
-  const ready = await client.readyPromise;
-  // @ts-ignore
-  return ready.getGlobalStat();
-}
+const { Header, Footer, Sider, Content } = Layout;
 
-export default () => {
-  const { Header, Footer, Sider, Content } = Layout;
-  const { data, error, loading } = useRequest(getInfo, {
-    pollingInterval: 1000,
-  });
-
-  // 从store中解构出client实列和全局状态
-  useEffect(() => {
-    if (error) {
-      Notification.error({
-        content: "连接服务器失败",
-        duration: 0,
-      });
-    } else {
-      Notification.success({
-        title: "Hi, Guys",
-        content: "成功连接服务器啦了😘",
-        duration: 1.5,
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (data) {
-      store.globalState = data;
-    }
-  }, [data]);
-
-  useEffect(() => {
-    solveBugs();
-  }, []);
+function RenderPageLayout(props) {
+  // useEffect(() => {
+  //   if (error) {
+  //     // Notification.error({
+  //     //   content: "连接服务器失败",
+  //     //   duration: 0,
+  //     // });
+  //   } else {
+  //     // Notification.success({
+  //     //   title: "Hi, Guys",
+  //     //   content: "成功连接服务器啦了😘",
+  //     //   duration: 1.5,
+  //     // });
+  //   }
+  // }, [error]);
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -79,4 +56,6 @@ export default () => {
       </Layout>
     </Layout>
   );
-};
+}
+
+export default RenderPageLayout;

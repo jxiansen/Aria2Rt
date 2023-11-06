@@ -1,23 +1,19 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { visualizer } from "rollup-plugin-visualizer";
-import progress from "vite-plugin-progress";
+import react from "@vitejs/plugin-react-swc";
+
 // https://vitejs.dev/config/
 
 export default defineConfig({
-  plugins: [react(), progress(), visualizer()],
-  base: "./",
-  server: {
-    port: 4000,
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
   },
+
   build: {
-    // rollupOptions: {
-    //   output: {
-    //     manualChunks: {
-    //       lodash: ["lodash"],
-    //       react: ["react"],
-    //     },
-    //   },
-    // },
+    rollupOptions: {
+      external: ["react", "react-dom", "react-dom/client"],
+    },
   },
 });

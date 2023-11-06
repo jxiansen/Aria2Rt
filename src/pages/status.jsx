@@ -1,3 +1,4 @@
+import { getVersion } from "@/services";
 import {
   Notification,
   Button,
@@ -6,15 +7,8 @@ import {
   Toast,
   Popconfirm,
 } from "@douyinfe/semi-ui";
-import { useRequest } from "ahooks";
-import { useState } from "react";
-import client from "../client";
 
-const getVersion = async () => {
-  const ready = await client.readyPromise;
-  // @ts-ignore
-  return ready.getVersion();
-};
+import { useState, useEffect } from "react";
 
 const style = {
   boxShadow: "var(--semi-shadow-elevated)",
@@ -26,19 +20,30 @@ const style = {
 };
 
 export default () => {
-  const [visible, setVisible] = useState(false);
-  const { data, error, loading } = useRequest(getVersion);
-  if (loading) {
-    return <h1>加载中</h1>;
-  }
-  const dataa = [
+  const [status, setStatus] = useState(null);
+
+  useEffect(() => {
+    getVersion().then((res) => {
+      const { result } = res || {};
+      if (!result) {
+        console.log(res);
+        return Toast.error("获取版本信息失败");
+      }
+      console.log(result);
+      setStatus(result);
+    });
+  }, []);
+
+  if (!status) return null;
+
+  const data = [
     { key: "Aria2状态", value: <Button>已经连接</Button> },
-    { key: "Aria2版本", value: data.version },
+    { key: "Aria2版本", value: status.version },
     {
       key: "启用功能",
       value: (
         <ButtonGroup size="small">
-          {data.enabledFeatures.map((val: string, idx: number) => {
+          {status.enabledFeatures.map((val, idx) => {
             return <Button key={idx}>{val}</Button>;
           })}
         </ButtonGroup>
@@ -65,7 +70,6 @@ export default () => {
             title="确认关闭？"
             content="aria2客户端讲会被关闭掉"
             onConfirm={async () => {
-              // @ts-ignore
               const res = await client.shutdown();
               Toast.success(res);
             }}
@@ -76,5 +80,5 @@ export default () => {
       ),
     },
   ];
-  return <Descriptions data={dataa} row size="large" style={style} />;
+  return <Descriptions data={data} row size="large" style={style} />;
 };

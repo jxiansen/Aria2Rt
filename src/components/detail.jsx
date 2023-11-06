@@ -6,11 +6,11 @@ import {
   formatSeconds,
   getNameFromFiles,
   sizeTostr,
-} from "./../tool";
+} from "../utils";
 import { useRequest } from "ahooks";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import client from "../client";
+// import client from "../client";
 import { useImmer } from "use-immer";
 
 export default () => {
@@ -18,20 +18,18 @@ export default () => {
   const [isTorrent, setTorrentStatus] = useState(false);
   async function getDetails() {
     const ready = await client.readyPromise;
-    // @ts-ignore
+
     return client.tellStatus(gid);
     // return ready.getPeers(gid);
   }
-  const { data, error, loading } = useRequest(getDetails, {
-    pollingInterval: 1000,
-  });
+  const { data, error, loading } = useRequest(getDetails);
 
   // 每次数据文件信息更新后重新设置数据流
   useEffect(() => {
     if (data) {
       if (data.bittorrent) {
         setTorrentStatus(true);
-        // @ts-ignore
+
         setTreeData(convertArrToTree(data.files));
       }
     }
@@ -141,7 +139,7 @@ export default () => {
         try {
           if (data && data.bittorrent.announceList.length) {
             return data.bittorrent.announceList.reduce(
-              (acc: string, cur: string) => acc + " | " + cur
+              (acc, cur) => acc + " | " + cur
             );
           }
         } catch (err) {
@@ -186,7 +184,6 @@ export default () => {
       <TabPane tab="总览" itemKey="1">
         <Table
           dataSource={tableData}
-          // @ts-ignore
           columns={columns}
           pagination={false}
           showHeader={false}
@@ -196,7 +193,6 @@ export default () => {
       <TabPane tab="区块信息" itemKey="2">
         <div style={{ margin: "40px 0 0 50px" }}>
           <HeatMapGrid
-            // @ts-ignore
             data={data === undefined ? [] : convert(data.bitfield)}
             cellStyle={(_x, _y, ratio) => ({
               background: `rgb(12, 160, 44, ${ratio})`,

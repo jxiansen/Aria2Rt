@@ -3,12 +3,47 @@ import set from "lodash/set";
 import get from "lodash/get";
 import invert from "lodash/invert";
 import assign from "lodash/assign";
+
+export function formatBytes(bytes) {
+  const _bytes = parseInt(bytes);
+  if (_bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(_bytes) / Math.log(k));
+  return (_bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
+}
+
+// 计算下载进度
+export function getPercent(completedLength, totalLength) {
+  const per = ((completedLength / totalLength) * 100).toFixed(2);
+  if (isNaN(per)) {
+    return 0;
+  }
+  return per;
+}
+
+// 计算下载剩余时间
+export function getRemainTime(completedLength, totalLength, downloadSpeed) {
+  const remainBytes = totalLength - completedLength;
+  if (downloadSpeed === 0) {
+    return "剩余时间未知";
+  }
+  const remainTime = remainBytes / downloadSpeed;
+  if (remainTime > 24 * 60 * 60) {
+    return "超过一天";
+  }
+  var h = Math.floor(remainTime / 3600);
+  var m = Math.floor((remainTime / 60) % 60);
+  var s = Math.floor(remainTime % 60);
+  return h + "小时" + m + "分钟" + s + "秒";
+}
+
 /**
  * 网速转换,将BPS转换为适当的维度单位
  * @param {string}
  * @return {string}
  */
-export function convertSpeed(speed: string) {
+export function convertSpeed(speed) {
   if (speed.length < 4) {
     return `${speed}B/s`;
   }
@@ -25,7 +60,7 @@ export function convertSpeed(speed: string) {
  * @param {string}
  * @return {string}
  */
-export function sizeTostr(size: string) {
+export function sizeTostr(size) {
   if (+size < 1024) {
     return Number(size + ".00").toFixed(2) + "B";
   }
@@ -46,7 +81,7 @@ export function sizeTostr(size: string) {
  * @param {string}
  * @return {string}
  */
-export function formatSeconds(speed: string, totalLength: string) {
+export function formatSeconds(speed, totalLength) {
   const seconds = +totalLength / +speed;
   if (seconds > 24 * 60 * 60 || speed === "0") {
     return "超过一天";
@@ -62,8 +97,7 @@ export function formatSeconds(speed: string, totalLength: string) {
  * @param {string}
  * @return {array}
  */
-
-export const convert = (char: string) => {
+export const convert = (char) => {
   let res = "";
   for (let item of char) {
     let temp = parseInt(item, 16).toString(2);
@@ -80,14 +114,12 @@ export const convert = (char: string) => {
 /**
  * 从files对象中获得文件名
  */
-export function getNameFromFiles(files: object[]) {
+export function getNameFromFiles(files) {
   try {
-    // @ts-ignore
     if (files.path.length) {
-      // @ts-ignore
       return files.path.replace("/root/downloads/", "");
     }
-    // @ts-ignore
+
     const url = files.uris[0].uri;
     if (url.length) {
       const arr = url.split("/");
@@ -100,7 +132,7 @@ export function getNameFromFiles(files: object[]) {
 }
 
 // 将数组的扁平结构转换成树状结构,返回对象
-export function convertArrToTree(arr: any) {
+export function convertArrToTree(arr) {
   const obj = {};
   let id = 0;
   let prePath;
@@ -115,7 +147,6 @@ export function convertArrToTree(arr: any) {
     }
     let newPath = path + "." + id;
     if (!path.length) {
-      // @ts-ignore
       newPath = id;
     }
     set(
@@ -132,18 +163,17 @@ export function convertArrToTree(arr: any) {
 }
 
 // 遍历对象数的所有叶子节点并调换键值顺序
-function getTreeData(obj: object) {
-  const pathArr: string[] = [];
+function getTreeData(obj) {
+  const pathArr = [];
   for (let key in obj) {
     const newPathArr = [...pathArr, key];
     // 当前键对应的值
     let val = get(obj, newPathArr);
     // 如果是数字就调换 key-val值
-    // @ts-ignore
+
     if (!isNaN(key)) {
-      // @ts-ignore
       obj[val] = key;
-      // @ts-ignore
+
       delete obj[key];
       continue;
     }
