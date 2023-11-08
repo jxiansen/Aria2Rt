@@ -5,44 +5,45 @@ import divide from "lodash/divide";
 import { IconChevronRight, IconDelete } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 import { getNameFromFiles } from "../utils";
-import { useRequest } from "ahooks";
-import { useImmer } from "use-immer";
-import { useEffect } from "react";
-// import client from "../client";
+
+import { useEffect, useState } from "react";
+import { tellStopped } from "@/services";
+
+const reqArgs = [
+  -1,
+  1000,
+  [
+    "gid",
+    "totalLength",
+    "completedLength",
+    "uploadSpeed",
+    "downloadSpeed",
+    "connections",
+    "numSeeders",
+    "seeder",
+    "status",
+    "errorCode",
+    "verifiedLength",
+    "verifyIntegrityPending",
+    "bittorrent",
+    "infoHash",
+  ],
+];
 
 export default function App() {
-  const [isLoading, setLoading] = useImmer(true);
   // 所有已经完成的任务数据存储
   const navigate = useNavigate();
-
-  async function getStop() {
-    const ready = await client.readyPromise;
-
-    return await ready.tellStopped(-1, 1000, [
-      "gid",
-      "totalLength",
-      "completedLength",
-      "uploadSpeed",
-      "downloadSpeed",
-      "connections",
-      "numSeeders",
-      "seeder",
-      "status",
-      "errorCode",
-      "verifiedLength",
-      "verifyIntegrityPending",
-      "files",
-      "bittorrent",
-      "infoHash",
-    ]);
-  }
-  const { data, error, loading } = useRequest(getStop);
+  const [stoppedList, setStoppedList] = useState([]);
 
   useEffect(() => {
-    if (loading) {
-      setLoading(false);
-    }
-  }, [data]);
+    setInterval(() => {
+      tellStopped(reqArgs).then((res) => {
+        const { result } = res || {};
+        result && setStoppedList(result);
+        console.log(result);
+      });
+    }, [1000]);
+  }, []);
 
   const columns = [
     {
@@ -141,16 +142,15 @@ export default function App() {
       };
     }
   };
+  return null;
 
   return (
-    <>
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-        onRow={handleRow}
-        loading={isLoading}
-      />
-    </>
+    <Table
+      columns={columns}
+      dataSource={data}
+      pagination={false}
+      // onRow={handleRow}
+      loading={isLoading}
+    />
   );
 }

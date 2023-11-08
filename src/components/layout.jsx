@@ -4,11 +4,29 @@ import HeaderContent from "./header";
 import SiderContent from "./sider";
 import { Outlet } from "react-router-dom";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getGlobalStat } from "@/services";
+import { formatBytes } from "@/utils";
 
 const { Header, Footer, Sider, Content } = Layout;
 
 function RenderPageLayout(props) {
+  const [globalState, setGlobalState] = useState({});
+
+  useEffect(() => {
+    setInterval(() => {
+      getGlobalStat().then((res) => {
+        const { result } = res || {};
+        if (!result) {
+          return;
+        }
+
+        document.title = `Aria2-下载${formatBytes(result.downloadSpeed)}/s`;
+        setGlobalState(result);
+      });
+    }, 1000);
+  }, []);
+
   // useEffect(() => {
   //   if (error) {
   //     // Notification.error({
@@ -27,7 +45,7 @@ function RenderPageLayout(props) {
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider style={{ backgroundColor: "var(--semi-color-bg-1)" }}>
-        <SiderContent />
+        <SiderContent globalState={globalState} />
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "var(--semi-color-bg-1)" }}>
@@ -51,7 +69,7 @@ function RenderPageLayout(props) {
             backgroundColor: "rgba(var(--semi-grey-0), 1)",
           }}
         >
-          <FooterContent />
+          <FooterContent globalState={globalState} />
         </Footer>
       </Layout>
     </Layout>

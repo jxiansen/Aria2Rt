@@ -10,6 +10,10 @@ export function tellActive() {
   return wsClient.send("aria2.tellActive");
 }
 
+export function tellStopped(params) {
+  return wsClient.send("aria2.tellStopped", ...params);
+}
+
 export function getVersion() {
   return wsClient.send("aria2.getVersion");
 }

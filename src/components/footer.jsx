@@ -9,23 +9,11 @@ import { useState, useEffect } from "react";
 import { getGlobalStat } from "@/services";
 
 function Footer(props) {
-  const [visible, setVisible] = useState(false);
+  const { globalState } = props || {};
 
-  const [globalState, setGlobalState] = useState({});
   const { downloadSpeed, uploadSpeed } = globalState || {};
 
-  useEffect(() => {
-    setInterval(() => {
-      getGlobalStat().then((res) => {
-        const { result } = res || {};
-        if (!result) {
-          return;
-        }
-        document.title = `Aria2-下载${formatBytes(result.downloadSpeed)}/s`;
-        setGlobalState(result);
-      });
-    }, 1000);
-  }, []);
+  const [visible, setVisible] = useState(false);
 
   // 存储全局设置选项
   const [options, setOptions] = useState({});

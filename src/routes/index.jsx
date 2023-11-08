@@ -13,16 +13,16 @@ const routes = [
   {
     path: "/",
     element: <Layout />,
-    // children: [
-    //   { path: "downloading", element: <Downloading /> },
-    //   { path: "waiting", element: <Waiting /> },
-    //   { path: "stopped", element: <Stopped /> },
-    //   { path: "new", element: <New /> },
-    //   { path: "task/detail/:gid", element: <Detail /> },
-    //   { path: "settings", element: <Settings /> },
-    //   { path: "status", element: <Status /> },
-    //   { path: "dashboard", element: <Charts /> },
-    // ],
+    children: [
+      { path: "downloading", element: <Downloading /> },
+      { path: "waiting", element: <Waiting /> },
+      { path: "stopped", element: <Stopped /> },
+      { path: "new", element: <New /> },
+      { path: "task/detail/:gid", element: <Detail /> },
+      { path: "settings", element: <Settings /> },
+      { path: "status", element: <Status /> },
+      { path: "dashboard", element: <Charts /> },
+    ],
   },
 ];
 

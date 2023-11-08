@@ -8,24 +8,23 @@ import {
   IconPulse,
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { useImmer } from "use-immer";
 
-export default () => {
+function RenderSider(props) {
+  const { globalState } = props || {};
+  const { numActive, numStopped, numWating } = globalState || {};
+
   const navigate = useNavigate();
-  const [selectedKey, setSelectedKey] = useImmer([]);
 
   return (
     <Nav
       style={{ maxWidth: 220, height: "100%" }}
-      onSelect={({ itemKey, selectedKeys, selectedItems, isOpen }) => {
-        setSelectedKey(selectedKeys);
-        navigate(itemKey.toString());
+      onSelect={({ itemKey }) => {
+        navigate(itemKey);
       }}
-      selectedKeys={selectedKey}
       items={[
         {
           itemKey: "downloading",
-          text: +numActive ? `正在下载(${numActive})` : `正在下载`,
+          text: `正在下载 ${Number(numActive) ? `(${numActive})` : ""}`,
           icon: <IconDownload size="large" />,
         },
         {
@@ -35,14 +34,12 @@ export default () => {
         },
         {
           itemKey: "waiting",
-          text: +numWaiting ? `正在等待(${numWaiting})` : "正在等待",
+          text: `正在等待 ${Number(numWating) ? `(${numWating})` : ""}`,
           icon: <IconClock size="large" />,
         },
         {
           itemKey: "stopped",
-          text: +numStopped
-            ? `已完成/已经停止(${numStopped})`
-            : "已完成/已经停止",
+          text: `已完成/已停止 ${Number(numStopped) ? `(${numStopped})` : ""}`,
           icon: <IconTickCircle size="large" />,
         },
 
@@ -58,14 +55,14 @@ export default () => {
         },
       ]}
       header={{
+        text: "Aria2Rt",
         logo: (
           <img src="//lf1-cdn-tos.bytescm.com/obj/ttfe/ies/semi/webcast_logo.svg" />
         ),
-        text: "Aria2Rt",
       }}
-      footer={{
-        collapseButton: true,
-      }}
+      footer={{ collapseButton: true }}
     />
   );
-};
+}
+
+export default RenderSider;
