@@ -2,11 +2,12 @@ import Layout from "@/components/layout";
 import Downloading from "@/pages/downloading";
 import Stopped from "@/pages/stopped";
 import New from "@/components/new";
-import Detail from "@/components/detail";
+import Detail from "@/pages/detail";
 import Waiting from "@/pages/waiting";
 import Settings from "@/pages/settings";
 import Status from "@/pages/status";
 import Charts from "@/components/charts";
+
 import { useRoutes } from "react-router-dom";
 
 const routes = [

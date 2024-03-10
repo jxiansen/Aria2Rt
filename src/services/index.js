@@ -17,3 +17,11 @@ export function tellStopped(params) {
 export function getVersion() {
   return wsClient.send("aria2.getVersion");
 }
+
+export function getPeers(gid) {
+  return wsClient.send("aria2.getPeers", gid);
+}
+
+export function tellStatus(gid) {
+  return wsClient.send("aria2.tellStatus", gid);
+}

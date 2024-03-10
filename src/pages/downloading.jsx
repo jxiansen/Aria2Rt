@@ -60,14 +60,21 @@ const formatData = (data) => {
 function Downloading() {
   const [activeList, setActiveList] = useState([]);
 
+  const initTaskList = () => {
+    tellActive().then((res) => {
+      console.log(res);
+      setActiveList(res || []);
+    });
+  };
+
   useEffect(() => {
-    setInterval(() => {
-      tellActive().then((res) => {
-        const { result } = res || {};
-        setActiveList(result);
-        console.log(result);
-      });
+    let timeId = setInterval(() => {
+      initTaskList();
     }, 2000);
+
+    return () => {
+      clearInterval(timeId);
+    };
   }, []);
 
   const dataSource = useMemo(() => {
@@ -141,7 +148,7 @@ function Downloading() {
       columns={columns}
       pagination={false}
       onRow={handleRow}
-      rowSelection={rowSelection}
+      // rowSelection={rowSelection}
     />
   );
 }

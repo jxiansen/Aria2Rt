@@ -98,7 +98,11 @@ export function formatSeconds(speed, totalLength) {
  * @return {array}
  */
 export const convert = (char) => {
+  if (typeof char !== "string") {
+    return [];
+  }
   let res = "";
+
   for (let item of char) {
     let temp = parseInt(item, 16).toString(2);
     if (temp.length < 4) {
@@ -188,31 +192,36 @@ function getTreeData(obj) {
   return obj;
 }
 
-// 解决出bug 问题
-export function solveBugs() {
-  console.log(
-    [
-      "                   _ooOoo_",
-      "                  o8888888o",
-      '                  88" . "88',
-      "                  (| -_- |)",
-      "                  O\\  =  /O",
-      "               ____/`---'\\____",
-      "             .'  \\\\|     |//  `.",
-      "            /  \\\\|||  :  |||//  \\",
-      "           /  _||||| -:- |||||-  \\",
-      "           |   | \\\\\\  -  /// |   |",
-      "           | \\_|  ''\\---/''  |   |",
-      "           \\  .-\\__  `-`  ___/-. /",
-      "         ___`. .'  /--.--\\  `. . __",
-      '      ."" \'<  `.___\\_<|>_/___.\'  >\'"".',
-      "     | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |",
-      "     \\  \\ `-.   \\_ __\\ /__ _/   .-` /  /",
-      "======`-.____`-.___\\_____/___.-`____.-'======",
-      "                   `=---='",
-      "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-      "===============Code By Mr-j==================",
-      "         佛祖保佑       永无BUG",
-    ].join("\n")
-  );
+export function decodePercentEncodedString(s) {
+  if (!s) {
+    return s;
+  }
+
+  var ret = "";
+
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i);
+
+    if (ch === "%" && i < s.length - 2) {
+      var code = s.substring(i + 1, i + 3);
+      ret += String.fromCharCode(parseInt(code, 16));
+      i += 2;
+    } else {
+      ret += ch;
+    }
+  }
+
+  return ret;
 }
+
+// 将十六进制字符串转换为二进制字符串
+export const hexToBinary = (hexString) => {
+  let binaryString = "";
+  for (let i = 0; i < hexString.length; i++) {
+    const hexChar = hexString[i];
+    let binaryChar = parseInt(hexChar, 16).toString(2);
+    binaryChar = binaryChar.padStart(4, "0");
+    binaryString += binaryChar;
+  }
+  return binaryString;
+};

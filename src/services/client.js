@@ -37,6 +37,7 @@ const allMethods = [
   "system.listMethods",
   "system.listNotifications",
 ];
+import { Notification, Button } from "@douyinfe/semi-ui";
 
 class Client {
   constructor(url, secret) {
@@ -51,24 +52,37 @@ class Client {
 
     this.ws.onopen = (event) => {
       this.connected = true;
-      console.log("连接开启");
+      Notification.success({
+        title: "通知",
+        content: `${this.url} 已连接成功！`,
+        duration: 3,
+      });
       this.sendQueueMessage();
     };
 
     this.ws.onclose = (event) => {
-      console.log("连接关闭");
+      Notification.warning({
+        title: "通知",
+        content: `${this.url} 连接已断开`,
+        duration: 3,
+      });
     };
 
     this.ws.onerror = (event) => {
-      console.log("连接错误");
+      Notification.error({
+        title: "通知",
+        content: `连接错误`,
+        duration: 3,
+      });
     };
 
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         const messageId = data.id;
+        const result = data.result || {};
         if (messageId && this.messagePromise[messageId]) {
-          this.messagePromise[messageId].resolve(data);
+          this.messagePromise[messageId].resolve(result);
           delete this.messagePromise[messageId];
         }
       } catch (e) {

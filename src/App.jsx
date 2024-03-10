@@ -1,37 +1,54 @@
-// import { Route, Routes, Navigate } from "react-router-dom";
-// import Layout from "./components/layout";
-// import Downloading from "./pages/downloading";
-// import Stopped from "./pages/stopped";
-// import New from "./components/new";
-// import Detail from "./components/detail";
-// import Waiting from "./pages/waiting";
-// import Settings from "./pages/settings";
-// import Status from "./pages/status";
-// import Charts from "./components/charts";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
-// export default () => {
-//   return (
-//     <Routes>
-//       <Route path="/" element={<Layout />}>
-//         <Route path="downloading" element={<Downloading />} />
-//         <Route path="waiting" element={<Waiting />} />
-//         <Route path="stopped" element={<Stopped />} />
-//         <Route path="new" element={<New />} />
-//         <Route path="task/detail/:gid" element={<Detail />} />
-//         <Route path="settings" element={<Settings />} />
-//         <Route path="status" element={<Status />} />
-//         <Route path="dashboard" element={<Charts />} />
-//       </Route>
-//       <Route path="*" element={<Navigate replace to="/" />} />
-//     </Routes>
-//   );
-// };
+import Layout from "./components/layout";
+import Downloading from "./pages/downloading";
+import Stopped from "./pages/stopped";
+import New from "./components/new";
 
-import Router from "@/routes";
+import Waiting from "./pages/waiting";
+import Settings from "./pages/settings";
+import Status from "./pages/status";
+import Charts from "./components/charts";
+import { getGlobalStat } from "./services";
+import TaskDetail from "@/pages/taskDetail";
+import "@/assets/index.less";
 
 function App() {
-  return <Router />;
-}
+  const [globalStatus, setGlobalStatus] = useState({});
+  const context = {
+    globalStatus,
+  };
 
+  const initData = () => {
+    getGlobalStat().then((res) => {
+      setGlobalStatus(res);
+    });
+  };
+
+  useEffect(() => {
+    setInterval(() => {
+      initData();
+    }, 1000);
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout context={context} />}>
+          <Route path="downloading" element={<Downloading />} />
+          <Route path="task/detail/:gid" element={<TaskDetail />} />
+          <Route path="waiting" element={<Waiting />} />
+          <Route path="stopped" element={<Stopped />} />
+          <Route path="new" element={<New />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="status" element={<Status />} />
+          <Route path="dashboard" element={<Charts />} />
+        </Route>
+        <Route path="*" element={<Navigate replace to="/" />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 export default App;

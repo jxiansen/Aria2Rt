@@ -1,10 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-
-// https://vitejs.dev/config/
+import million from "million/compiler";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [million.vite({ auto: true }), react()],
   resolve: {
     alias: {
       "@": "/src",
