@@ -1,9 +1,10 @@
 import { getPeers } from "@/services";
 import { useEffect, useRef, useMemo, useState } from "react";
-import { Table } from "@douyinfe/semi-ui";
+import { Table, Space } from "@douyinfe/semi-ui";
+import { IconArrowDown, IconArrowUp } from "@douyinfe/semi-icons";
 import BitFieldCanvas from "@/components/bitFieldSvg";
 import parseClientFromPeerid from "@/helpers/parsePeerid";
-import { decodePercentEncodedString } from "@/utils";
+import { decodePercentEncodedString, formattedFileSize } from "@/utils";
 
 function ConnectStatus(props) {
   const { taskId } = props || {};
@@ -35,21 +36,17 @@ function ConnectStatus(props) {
       render: (text) => {
         const peerId = text ? decodePercentEncodedString(text) : "";
         const clientInfo = parseClientFromPeerid(peerId) || {};
+        const { client, version } = clientInfo || {};
 
-        if (clientInfo && clientInfo.client !== "unknow") {
-          const { client = "", version = "" } = clientInfo || {};
-          return `${client} (${version})`;
+        if (client === "unknown" || !client) {
+          return null;
         }
 
-        return null;
+        return `${client} (${version})`;
       },
     },
     {
       title: "状态",
-      dataIndex: "owner",
-    },
-    {
-      title: "进度",
       dataIndex: "bitfield",
       render: (text) => {
         return <BitFieldCanvas bitField={text} />;
@@ -58,10 +55,26 @@ function ConnectStatus(props) {
     {
       title: "下载速度",
       dataIndex: "downloadSpeed",
+      render: (text) => {
+        return (
+          <Space spacing={2}>
+            <IconArrowDown size={16} style={{ color: "#208fe5" }} />
+            <span>{`${formattedFileSize(Number(text))}/s`}</span>
+          </Space>
+        );
+      },
     },
     {
       title: "上传速度",
       dataIndex: "uploadSpeed",
+      render: (text) => {
+        return (
+          <Space spacing={2}>
+            <IconArrowUp size={16} style={{ color: "#74a329" }} />
+            <span>{`${formattedFileSize(Number(text))}/s`}</span>
+          </Space>
+        );
+      },
     },
   ];
 

@@ -11,41 +11,27 @@ import { formatBytes } from "@/utils";
 const { Header, Footer, Sider, Content } = Layout;
 
 function RenderPageLayout(props) {
-  const [globalState, setGlobalState] = useState({});
-
-  useEffect(() => {
-    setInterval(() => {
-      getGlobalStat().then((res) => {
-        const { result } = res || {};
-        if (!result) {
-          return;
-        }
-
-        document.title = `Aria2-下载${formatBytes(result.downloadSpeed)}/s`;
-        setGlobalState(result);
-      });
-    }, 1000);
-  }, []);
+  const { context } = props || {};
+  const { globalStatus } = context || {};
 
   // useEffect(() => {
-  //   if (error) {
-  //     // Notification.error({
-  //     //   content: "连接服务器失败",
-  //     //   duration: 0,
-  //     // });
-  //   } else {
-  //     // Notification.success({
-  //     //   title: "Hi, Guys",
-  //     //   content: "成功连接服务器啦了😘",
-  //     //   duration: 1.5,
-  //     // });
-  //   }
-  // }, [error]);
+  //   setInterval(() => {
+  //     getGlobalStat().then((res) => {
+  //       const { result } = res || {};
+  //       if (!result) {
+  //         return;
+  //       }
+
+  //       document.title = `Aria2-下载${formatBytes(result.downloadSpeed)}/s`;
+  //       setGlobalState(result);
+  //     });
+  //   }, 1000);
+  // }, []);
 
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider style={{ backgroundColor: "var(--semi-color-bg-1)" }}>
-        <SiderContent globalState={globalState} />
+        <SiderContent globalStatus={globalStatus} />
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "var(--semi-color-bg-1)" }}>
@@ -69,7 +55,7 @@ function RenderPageLayout(props) {
             backgroundColor: "rgba(var(--semi-grey-0), 1)",
           }}
         >
-          <FooterContent globalState={globalState} />
+          <FooterContent globalStatus={globalStatus} />
         </Footer>
       </Layout>
     </Layout>

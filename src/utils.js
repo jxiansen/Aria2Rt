@@ -225,3 +225,45 @@ export const hexToBinary = (hexString) => {
   }
   return binaryString;
 };
+
+// 计算下载剩余时间
+export function calculateRemainingTime(remainingLength, downloadSpeed) {
+  if (!remainingLength || downloadSpeed === 0) {
+    return "超过一天";
+  }
+
+  // 计算剩余时间（单位：秒）
+  const remainingSeconds = remainingLength / downloadSpeed;
+
+  // 格式化剩余时间
+  const hours = remainingSeconds / 3600;
+  const minutes = (remainingSeconds % 3600) / 60;
+  const seconds = (remainingSeconds % 3600) % 60;
+
+  if (hours > 24) {
+    return "超过一天";
+  }
+
+  const _h = `${Math.trunc(hours)}`.padStart(2, "0");
+  const _m = `${Math.trunc(minutes)}`.padStart(2, "0");
+  const _s = `${Math.trunc(seconds)}`.padStart(2, "0");
+
+  // 返回格式化后的剩余时间
+  return [_h, _m, _s].join(":");
+}
+
+/**
+ * Returns a human readable file size string from size in bytes.
+ *
+ * @param  {Number} size s
+ * @return {String}
+ */
+export function formattedFileSize(size) {
+  const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0;
+
+  return (
+    (size / Math.pow(1024, i)).toFixed(2) * 1 +
+    " " +
+    ["B", "KB", "MB", "GB", "TB"][i]
+  );
+}

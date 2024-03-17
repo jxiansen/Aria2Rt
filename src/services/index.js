@@ -25,3 +25,11 @@ export function getPeers(gid) {
 export function tellStatus(gid) {
   return wsClient.send("aria2.tellStatus", gid);
 }
+
+export function getOption() {
+  return wsClient.send("aria2.getOption");
+}
+
+export function changeGlobalOption(params) {
+  return wsClient.send("aria2.changeGlobalOption", params);
+}

@@ -99,10 +99,9 @@ function Downloading() {
         return (
           <Progress
             percent={Number(data)}
-            style={{ height: 10, width: 100 }}
+            style={{ height: 20, width: 200 }}
             showInfo
             size="large"
-            format={(per) => per + "%"}
           />
         );
       },
