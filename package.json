@@ -10,17 +10,13 @@
   },
   "dependencies": {
     "@ant-design/plots": "^2.1.14",
-    "@canvasjs/react-charts": "^1.0.2",
     "@douyinfe/semi-ui": "^2.54.0",
-    "@pi-lib/axis-chart": "^1.2.12",
     "@types/lodash": "^4.17.0",
     "ahooks": "^3.7.10",
     "million": "^3.0.6",
-    "radash": "^12.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
-    "use-immer": "^0.9.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {

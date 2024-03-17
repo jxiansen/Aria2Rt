@@ -9,17 +9,17 @@ import {
 
 import { isURL, isMagnetURI } from "validator";
 import { Typography } from "@douyinfe/semi-ui";
-import { useEffect } from "react";
-import { useImmer } from "use-immer";
+import { useEffect, useState } from "react";
+
 import { IconBolt } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 
 export default () => {
   const { Text } = Typography;
-  const [rowsCount, setRowsCount] = useImmer(0);
+  const [rowsCount, setRowsCount] = useState(0);
   // 将所有链接存储拼接成一个字符串,最后在split成一个链接数组
-  const [links, setLinks] = useImmer("");
-  const [urls, setUrls] = useImmer([]);
+  const [links, setLinks] = useState("");
+  const [urls, setUrls] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     const count = links.split("\n").length - 1;

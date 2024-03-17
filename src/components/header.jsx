@@ -18,16 +18,15 @@ import {
   IconFullScreenStroked,
 } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFullscreen } from "ahooks";
-import { useImmer } from "use-immer";
 
 export default () => {
   // 将document.body传递给ref,然后使用hooks来设置全屏
   const ref = useRef(document.body);
   const navigate = useNavigate();
   const [isFullscreen, { toggleFullscreen }] = useFullscreen(ref);
-  const [isDarkMode, setDarkMode] = useImmer(false);
+  const [isDarkMode, setDarkMode] = useState(false);
 
   const switchMode = () => {
     setDarkMode(!isDarkMode);

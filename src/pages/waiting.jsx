@@ -5,13 +5,13 @@ import divide from "lodash/divide";
 import { getNameFromFiles, sizeTostr } from "../utils";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
-import { useImmer } from "use-immer";
+
 // import client from "../client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default () => {
-  const [dataSource, setDataSource] = useImmer([]);
-  const [isLoading, setLoading] = useImmer(true);
+  const [dataSource, setDataSource] = useState([]);
+  const [isLoading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   async function getWaiting() {
