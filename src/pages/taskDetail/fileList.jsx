@@ -1,83 +1,110 @@
-import { Table } from "@douyinfe/semi-ui";
+import { Table, Space, Checkbox } from "@douyinfe/semi-ui";
+
+import ariaClient from "@/services/client";
+
+import { filesize } from "filesize";
 import { useMemo } from "react";
-import { set } from "lodash";
 
-// todo 待优化
-function toTree(obj) {
-  const tree = [];
+function insertIntoTree(tree, pathParts, data) {
+  if (pathParts.length === 0) {
+    return;
+  }
 
-  for (const key in obj) {
-    const val = obj[key];
+  const part = pathParts[0];
+  let node = tree.find((item) => item.name === part);
 
-    const node = {
-      fileName: key,
-      uk: key,
-    };
-
-    if (val.index) {
-      Object.assign(node, val);
-    } else {
-      node.children = toTree(obj[key]);
-    }
-
+  if (!node) {
+    node = { name: part, key: pathParts.join("/"), children: [] };
     tree.push(node);
   }
 
-  return tree;
+  if (pathParts.length === 1) {
+    node.data = data;
+
+    delete node.children;
+  } else {
+    insertIntoTree(node.children, pathParts.slice(1), data);
+  }
 }
 
-const getPathList = (pathStr, taskName) => {
-  const _path = pathStr.split("/") || [];
-
-  const targetIdx = _path.findIndex((item) => item === taskName);
-  return _path.slice(targetIdx + 1);
-};
-
 function RenderFileList(props) {
-  const { list, taskName } = props || {};
-
+  const { list } = props || {};
+  console.log(list, "list");
   const dataSource = useMemo(() => {
-    if (!Array.isArray(list) || !list.length || !taskName) {
-      return [];
-    }
+    const tree = [];
+    list &&
+      list.forEach((item) => {
+        const path = item.path.split("/").filter((part) => part.length > 0);
+        const suffixArr = ariaClient?._options?.path
+          ?.split("/")
+          .filter((part) => part.length > 0);
+        const pathParts = path.slice(suffixArr.length + 1, path.length);
 
-    const obj = {};
+        insertIntoTree(tree, pathParts, item);
+      });
 
-    for (let item of list) {
-      const { index, completedLength, length, path, selected } = item || {};
-      const pathList = getPathList(path, taskName);
-
-      const val = {
-        index,
-        progress: ((completedLength / length) * 100).toFixed(2),
-        selected: Boolean(selected),
-        size: +length,
-      };
-      set(obj, pathList, val);
-    }
-
-    return toTree(obj);
+    console.log(tree);
+    return tree;
   }, [list]);
 
   const columns = [
     {
       title: "文件名",
-      dataIndex: "fileName",
+      dataIndex: "name",
+      render: (text, record, idx) => {
+        const checked = record?.data?.selected;
+
+        return (
+          <Space>
+            <Checkbox checked={checked} />
+            <span>{text}</span>
+          </Space>
+        );
+      },
     },
     {
       title: "进度",
-      dataIndex: "progress",
+      render: (text, record, idx) => {
+        const _data = record.data;
+        if (_data) {
+          const { completedLength, length } = _data || {};
+          const progress = ((completedLength / length) * 100).toFixed(2);
+          return progress + " %";
+        }
+
+        return null;
+      },
     },
     {
       title: "文件大小",
-      dataIndex: "size",
+      dataIndex: "length",
+      render: (text, record, idx) => {
+        if (record.data) {
+          const fileLength = record.data.length || 0;
+          return filesize(fileLength);
+        }
+        return null;
+      },
     },
   ];
 
+  const handleRow = (record, index) => {
+    // 给偶数行设置斑马纹
+    if (index % 2 === 0) {
+      return {
+        style: {
+          background: "var(--semi-color-fill-0)",
+        },
+      };
+    } else {
+      return {};
+    }
+  };
+
   return (
     <Table
-      rowKey="uk"
       size="small"
+      onRow={handleRow}
       dataSource={dataSource}
       columns={columns}
       pagination={false}

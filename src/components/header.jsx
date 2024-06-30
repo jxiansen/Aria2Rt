@@ -53,7 +53,7 @@ export default () => {
           </Button>
           <Divider layout="vertical" margin="8px" />
           <Tooltip content={"继续任务"}>
-            <Button
+            {/* <Button
               type="tertiary"
               theme="borderless"
               icon={<IconPlay />}
@@ -72,27 +72,27 @@ export default () => {
                   curGid.length = 0;
                 }
               }}
-            />
+            /> */}
           </Tooltip>
           <Tooltip content={"暂停任务"}>
             <Button
               theme="borderless"
               icon={<IconPause />}
               // 暂停文件下载
-              onClick={async () => {
-                if (curGid.length) {
-                  const ready = await client.readyPromise;
-                  if (selectedAll) {
-                    暂停所有的任务;
-                    ready.forcePauseAll();
-                    return;
-                  }
-                  curGid.forEach((gid) => {
-                    ready.forcePause(gid);
-                  });
-                  curGid.length = 0;
-                }
-              }}
+              // onClick={async () => {
+              //   if (curGid.length) {
+              //     const ready = await client.readyPromise;
+              //     if (selectedAll) {
+              //       暂停所有的任务;
+              //       ready.forcePauseAll();
+              //       return;
+              //     }
+              //     curGid.forEach((gid) => {
+              //       ready.forcePause(gid);
+              //     });
+              //     curGid.length = 0;
+              //   }
+              // }}
               style={{
                 color: "var(--semi-color-text-2)",
               }}
@@ -105,15 +105,15 @@ export default () => {
               style={{
                 color: "var(--semi-color-text-2)",
               }}
-              onClick={async () => {
-                if (curGid.length) {
-                  const ready = await client.readyPromise;
-                  curGid.forEach((gid) => {
-                    ready.forceRemove(gid);
-                  });
-                  curGid.length = 0;
-                }
-              }}
+              // onClick={async () => {
+              //   if (curGid.length) {
+              //     const ready = await client.readyPromise;
+              //     curGid.forEach((gid) => {
+              //       ready.forceRemove(gid);
+              //     });
+              //     curGid.length = 0;
+              //   }
+              // }}
             />
           </Tooltip>
           <Divider layout="vertical" margin="8px" />

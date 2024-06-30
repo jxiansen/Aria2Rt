@@ -12,21 +12,7 @@ import {
   formatSeconds,
   getNameFromFiles,
 } from "../utils";
-import { tellActive } from "@/services";
-
-const rowSelection = {
-  onSelectAll: (selected) => {
-    if (selected) {
-      store.selectedAll = true;
-    }
-  },
-  onSelect: (record, selected) => {
-    const { curGid } = store;
-    if (selected) {
-      curGid.push(record.gid);
-    }
-  },
-};
+import ariaClient from "@/services/client";
 
 const formatData = (data) => {
   if (!Array.isArray(data) && data.length === 0) return [];
@@ -61,7 +47,7 @@ function Downloading() {
   const [activeList, setActiveList] = useState([]);
 
   const initTaskList = () => {
-    tellActive().then((res) => {
+    ariaClient.tellActive().then((res) => {
       console.log(res);
       setActiveList(res || []);
     });

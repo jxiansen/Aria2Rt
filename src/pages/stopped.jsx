@@ -1,48 +1,35 @@
+import { useEffect, useState } from "react";
 import { Table, Progress, Tooltip, Button, Toast } from "@douyinfe/semi-ui";
+import { IconChevronRight, IconDelete } from "@douyinfe/semi-icons";
+import { useNavigate } from "react-router-dom";
+
 import { sizeTostr } from "../utils";
 import floor from "lodash/floor";
 import divide from "lodash/divide";
-import { IconChevronRight, IconDelete } from "@douyinfe/semi-icons";
-import { useNavigate } from "react-router-dom";
 import { getNameFromFiles } from "../utils";
 
-import { useEffect, useState } from "react";
-import { tellStopped } from "@/services";
+import ariaClient from "@/services/client";
 
-const reqArgs = [
-  -1,
-  1000,
-  [
-    "gid",
-    "totalLength",
-    "completedLength",
-    "uploadSpeed",
-    "downloadSpeed",
-    "connections",
-    "numSeeders",
-    "seeder",
-    "status",
-    "errorCode",
-    "verifiedLength",
-    "verifyIntegrityPending",
-    "bittorrent",
-    "infoHash",
-  ],
-];
-
-export default function App() {
+function RenderStoppedPage() {
   // 所有已经完成的任务数据存储
   const navigate = useNavigate();
   const [stoppedList, setStoppedList] = useState([]);
 
+  const getStoppedList = () => {
+    ariaClient.tellStopped(0, 100).then((res) => {
+      console.log(res);
+      setStoppedList(res);
+    });
+  };
+
   useEffect(() => {
-    setInterval(() => {
-      tellStopped(reqArgs).then((res) => {
-        const { result } = res || {};
-        result && setStoppedList(result);
-        console.log(result);
-      });
+    const timer = setInterval(() => {
+      getStoppedList();
     }, [1000]);
+
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   const columns = [
@@ -142,15 +129,14 @@ export default function App() {
       };
     }
   };
-  return null;
 
   return (
     <Table
       columns={columns}
-      dataSource={data}
+      dataSource={stoppedList}
       pagination={false}
       // onRow={handleRow}
-      loading={isLoading}
     />
   );
 }
+export default RenderStoppedPage;

@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { List, Collapsible, Row, Col, Space } from "@douyinfe/semi-ui";
-import { Line } from "@ant-design/plots";
+import { filesize } from "filesize";
 import { IconPlusCircle } from "@douyinfe/semi-icons";
 
-import { formattedFileSize, calculateRemainingTime } from "@/utils";
+import { calculateRemainingTime } from "@/utils";
 
 const statusMap = {
   active: "正在下载",
@@ -11,36 +11,6 @@ const statusMap = {
 
 const modeMap = {
   single: "1个文件",
-};
-
-const config = {
-  xField: "now",
-  yField: "speed",
-  point: {
-    shapeField: "square",
-    sizeField: 4,
-  },
-
-  interaction: {
-    tooltip: {
-      // body: false,
-      // marker: false,
-      // groupName: false,
-      // sort: (item) => {
-      //   console.log(item);
-      // },
-      filter: (item) => {
-        if (item.name === "speed") {
-          return null;
-        }
-        return item;
-      },
-    },
-  },
-  colorField: "category",
-  style: {
-    lineWidth: 2,
-  },
 };
 
 function Overview(props) {
@@ -65,8 +35,6 @@ function Overview(props) {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const [lineData, setLineData] = useState([]);
-
   const toggleOpen = () => {
     setIsOpen((cur) => !cur);
   };
@@ -81,17 +49,10 @@ function Overview(props) {
     {
       name: "任务大小",
       genView: () => {
-        if (!totalLength) {
-          return null;
-        }
-        const size = formattedFileSize(+totalLength);
-
         return (
           <Space>
-            {size ? size : null}
-            <span style={{ color: "#325ab4" }}>
-              {(mode && modeMap[mode]) || ""}
-            </span>
+            <span>{filesize(totalLength || 0)}</span>
+            <span style={{ color: "#325ab4" }}>{modeMap?.[mode]}</span>
           </Space>
         );
       },
@@ -105,22 +66,15 @@ function Overview(props) {
     {
       name: "进度（健康度）",
       genView: () => {
-        if (!completedLength || !totalLength) {
-          return null;
-        }
         const progress = ((completedLength / totalLength) * 100).toFixed(2);
-
         return progress ? `${progress} %` : null;
       },
     },
     {
       name: "下载",
       genView: () => {
-        if (!completedLength || !downloadSpeed) {
-          return null;
-        }
-        const completedSize = formattedFileSize(+completedLength);
-        const speed = formattedFileSize(+downloadSpeed);
+        const completedSize = filesize(completedLength || 0);
+        const speed = filesize(downloadSpeed || 0);
         return `${completedSize} @ ${speed} /s`;
       },
     },
@@ -128,43 +82,27 @@ function Overview(props) {
     {
       name: "上传",
       genView: () => {
-        if (!uploadLength || !uploadSpeed) {
-          return null;
-        }
-        const uploadSize = formattedFileSize(+uploadLength);
-        const speed = formattedFileSize(+uploadSpeed);
-
+        const uploadSize = filesize(uploadLength || 0);
+        const speed = filesize(uploadSpeed || 0);
         return `${uploadSize} @ ${speed} /s`;
       },
     },
     {
       name: "分享率",
       genView: () => {
-        if (!completedLength || !uploadLength) {
-          return null;
-        }
         return (uploadLength / completedLength).toFixed(2) + " %";
       },
     },
     {
       name: "剩余时间",
       genView: () => {
-        if (!downloadSpeed || !totalLength || !completedLength) {
-          return null;
-        }
-
         const remainTime = totalLength - completedLength;
         return calculateRemainingTime(remainTime, downloadSpeed);
       },
     },
     {
       name: "种子数/连接数",
-      genView: () => {
-        if (!numSeeders || !connections) {
-          return null;
-        }
-        return `${numSeeders} / ${connections}`;
-      },
+      genView: () => `${numSeeders} / ${connections}`,
     },
     {
       name: "特征值",
@@ -177,15 +115,11 @@ function Overview(props) {
     {
       name: `BT 服务器`,
       genView: () => {
-        if (!announceList?.length) {
-          return null;
-        }
-
         return (
           <div>
             <Space>
-              {announceList[0]}
-              {announceList.length > 1 ? (
+              {announceList?.[0]}
+              {announceList?.length > 1 ? (
                 <>
                   <IconPlusCircle
                     style={{ color: "#208fe5", cursor: "pointer" }}
@@ -197,7 +131,7 @@ function Overview(props) {
               ) : null}
             </Space>
             <Collapsible isOpen={isOpen}>
-              {announceList.slice(1).map((item, idx) => (
+              {announceList?.slice(1).map((item, idx) => (
                 <p key={idx}>{item}</p>
               ))}
             </Collapsible>
@@ -206,28 +140,6 @@ function Overview(props) {
       },
     },
   ];
-
-  useEffect(() => {
-    if (!uploadSpeed || !downloadSpeed) {
-      return;
-    }
-
-    const dist = lineData.slice(-18);
-    const now = new Date().toLocaleTimeString();
-
-    dist.push({
-      now: now,
-      speed: +downloadSpeed,
-      category: "download",
-    });
-    dist.push({
-      now: now,
-      speed: +uploadSpeed,
-      category: "upload",
-    });
-
-    setLineData(dist);
-  }, [uploadSpeed, downloadSpeed]);
 
   return (
     <div>
@@ -247,9 +159,6 @@ function Overview(props) {
           );
         }}
       />
-
-      {/* theme="classicDark"  */}
-      <Line height={300} data={lineData} {...config} />
     </div>
   );
 }

@@ -5,7 +5,8 @@ import SiderContent from "./sider";
 import { Outlet } from "react-router-dom";
 
 import { useEffect, useState } from "react";
-import { getGlobalStat } from "@/services";
+import ariaClient from "@/services/client";
+
 import { formatBytes } from "@/utils";
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -13,20 +14,6 @@ const { Header, Footer, Sider, Content } = Layout;
 function RenderPageLayout(props) {
   const { context } = props || {};
   const { globalStatus } = context || {};
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     getGlobalStat().then((res) => {
-  //       const { result } = res || {};
-  //       if (!result) {
-  //         return;
-  //       }
-
-  //       document.title = `Aria2-下载${formatBytes(result.downloadSpeed)}/s`;
-  //       setGlobalState(result);
-  //     });
-  //   }, 1000);
-  // }, []);
 
   return (
     <Layout style={{ height: "100vh" }}>

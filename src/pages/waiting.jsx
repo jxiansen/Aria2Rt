@@ -6,57 +6,31 @@ import { getNameFromFiles, sizeTostr } from "../utils";
 import { IconChevronRight } from "@douyinfe/semi-icons";
 import { useNavigate } from "react-router-dom";
 
-// import client from "../client";
 import { useEffect, useState } from "react";
+import ariaClient from "@/services/client";
 
-export default () => {
+function RenderWaiting() {
   const [dataSource, setDataSource] = useState([]);
   const [isLoading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  async function getWaiting() {
-    const ready = await client.readyPromise;
-
-    return await ready.tellWaiting(0, 1000, [
-      "gid",
-      "totalLength",
-      "completedLength",
-      "uploadSpeed",
-      "downloadSpeed",
-      "connections",
-      "numSeeders",
-      "seeder",
-      "status",
-      "errorCode",
-      "verifiedLength",
-      "verifyIntegrityPending",
-      "files",
-      "bittorrent",
-      "infoHash",
-    ]);
-  }
-  const { data, error, loading } = useRequest(getWaiting);
-
-  useEffect(() => {
-    if (data && data.length) {
-      setDataSource(data);
-    }
-    if (loading) {
-      setLoading(false);
-    }
-  }, [data]);
+  const getWaitingList = () => {
+    ariaClient.tellWaiting(1, 130).then((res) => {
+      console.log(res);
+    });
+  };
 
   const rowSelection = {
-    onSelectAll: (selected) => {
-      if (selected) {
-        store.selectedAll = true;
-      }
-    },
-    onSelect: (record, selected) => {
-      if (selected) {
-        store.curGid.push(record.gid);
-      }
-    },
+    // onSelectAll: (selected) => {
+    //   if (selected) {
+    //     store.selectedAll = true;
+    //   }
+    // },
+    // onSelect: (record, selected) => {
+    //   if (selected) {
+    //     store.curGid.push(record.gid);
+    //   }
+    // },
   };
   const columns = [
     {
@@ -136,6 +110,11 @@ export default () => {
       };
     }
   };
+
+  useEffect(() => {
+    getWaitingList();
+  }, []);
+
   return (
     <Table
       columns={columns}
@@ -147,4 +126,6 @@ export default () => {
       rowSelection={rowSelection}
     />
   );
-};
+}
+
+export default RenderWaiting;

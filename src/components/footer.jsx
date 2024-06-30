@@ -6,8 +6,8 @@ import {
 } from "@douyinfe/semi-icons/lib/es/icons";
 import { useState } from "react";
 
-import { formattedFileSize } from "@/utils";
-import { changeGlobalOption } from "@/services";
+import ariaClient from "@/services/client";
+import { filesize } from "filesize";
 
 function Footer(props) {
   const { globalStatus } = props || {};
@@ -25,7 +25,7 @@ function Footer(props) {
     const optionsArr = Object.values(globalSpeed);
     // 使用正则表达式对输入的字符串进行校验是否满足指定的要求
     if (optionsArr.every((i) => reg.test(i))) {
-      changeGlobalOption(globalSpeed).then((res) => {
+      ariaClient.changeGlobalOption(globalSpeed).then((res) => {
         if (res === "OK") {
           Notification.warning({
             title: "提交成功",
@@ -50,19 +50,15 @@ function Footer(props) {
       </Space>
 
       <span style={{ display: "flex", alignItems: "center" }}>
-        {downloadSpeed ? (
-          <Space align="center" style={{ marginRight: "24px" }}>
-            <IconDownload size="large" style={{ color: "#208fe5" }} />
-            <span> {formattedFileSize(+downloadSpeed) + "/s"}</span>
-          </Space>
-        ) : null}
+        <Space align="center" style={{ marginRight: "24px" }}>
+          <IconDownload size="large" style={{ color: "#208fe5" }} />
+          <span> {filesize(downloadSpeed || 0) + "/s"}</span>
+        </Space>
 
-        {uploadSpeed ? (
-          <Space align="center">
-            <IconUpload size="large" style={{ color: "#74a329" }} />
-            <span> {formattedFileSize(+uploadSpeed) + "/s"}</span>
-          </Space>
-        ) : null}
+        <Space align="center">
+          <IconUpload size="large" style={{ color: "#74a329" }} />
+          <span> {`${filesize(uploadSpeed || 0)}/s`}</span>
+        </Space>
       </span>
 
       <Modal

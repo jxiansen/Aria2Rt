@@ -1,14 +1,16 @@
-import { getVersion } from "@/services";
+import { useState, useEffect } from "react";
 import {
   Notification,
   Button,
   ButtonGroup,
   Descriptions,
   Toast,
-  Popconfirm,
+  Modal,
+  Space,
+  Checkbox,
 } from "@douyinfe/semi-ui";
 
-import { useState, useEffect } from "react";
+import ariaClient from "@/services/client";
 
 const style = {
   boxShadow: "var(--semi-shadow-elevated)",
@@ -19,34 +21,55 @@ const style = {
   width: "800px",
 };
 
-export default () => {
-  const [status, setStatus] = useState(null);
+function RenderStatusPage() {
+  const [status, setStatus] = useState({});
+
+  const { version = "", enabledFeatures = [] } = status || {};
+
+  const getAriaStatus = () => {
+    ariaClient.getVersion().then((res) => {
+      console.log(res);
+      res && setStatus(res);
+    });
+  };
+
+  const closeAriaClient = () => {
+    Modal.confirm({
+      title: "确定关闭",
+      content: "您是否要关闭 aria2 客户端？",
+      onConfirm: () => {
+        ariaClient.shutdown().then((res) => {
+          if (res) {
+            Toast.success("关闭成功！");
+          } else {
+            Toast.error("关闭失败");
+          }
+        });
+      },
+    });
+  };
 
   useEffect(() => {
-    getVersion().then((res) => {
-      const { result } = res || {};
-      if (!result) {
-        console.log(res);
-        return Toast.error("获取版本信息失败");
-      }
-      console.log(result);
-      setStatus(result);
-    });
+    getAriaStatus();
   }, []);
-
-  if (!status) return null;
 
   const data = [
     { key: "Aria2状态", value: <Button>已经连接</Button> },
-    { key: "Aria2版本", value: status.version },
+    { key: "Aria2版本", value: version },
     {
-      key: "启用功能",
+      key: "已经启用功能",
+      span: 4,
       value: (
-        <ButtonGroup size="small">
-          {status.enabledFeatures.map((val, idx) => {
-            return <Button key={idx}>{val}</Button>;
-          })}
-        </ButtonGroup>
+        <div>
+          {enabledFeatures.map((val, idx) => (
+            <div key={idx}>
+              <Space>
+                <Checkbox checked />
+                <span>{val}</span>
+              </Space>
+            </div>
+          ))}
+        </div>
       ),
     },
     {
@@ -66,19 +89,16 @@ export default () => {
           >
             保存会话
           </Button>
-          <Popconfirm
-            title="确认关闭？"
-            content="aria2客户端讲会被关闭掉"
-            onConfirm={async () => {
-              const res = await client.shutdown();
-              Toast.success(res);
-            }}
-          >
-            <Button type="danger">关闭Aria2</Button>
-          </Popconfirm>
+
+          <Button type="danger" onClick={closeAriaClient}>
+            关闭Aria2
+          </Button>
         </ButtonGroup>
       ),
     },
   ];
-  return <Descriptions data={data} row size="large" style={style} />;
-};
+
+  return <Descriptions data={data} size="large" />;
+}
+
+export default RenderStatusPage;

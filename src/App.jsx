@@ -9,10 +9,10 @@ import New from "@/components/new";
 import Waiting from "@/pages/waiting";
 import Settings from "@/pages/settings";
 import Status from "@/pages/status";
-import { getGlobalStat } from "@/services";
 import TaskDetail from "@/pages/taskDetail";
 
 import "@/assets/index.less";
+import ariaClient from "@/services/client";
 
 function App() {
   const [globalStatus, setGlobalStatus] = useState({});
@@ -24,7 +24,7 @@ function App() {
   };
 
   const initData = () => {
-    getGlobalStat().then((res) => {
+    ariaClient.getGlobalStat().then((res) => {
       setGlobalStatus(res);
     });
   };
@@ -47,7 +47,7 @@ function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="status" element={<Status />} />
         </Route>
-        <Route path="*" element={<Navigate replace to="/" />} />
+        {/* <Route path="*" element={<Navigate replace to="/" />} /> */}
       </Routes>
     </BrowserRouter>
   );

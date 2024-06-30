@@ -1,11 +1,11 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Tabs, TabPane } from "@douyinfe/semi-ui";
-import ConnectStatus from "./connectStatus";
+import { Tabs, Steps, TabPane } from "@douyinfe/semi-ui";
 
 import Overview from "./overview";
-import { tellStatus } from "@/services";
-import { useEffect, useState } from "react";
+import ariaClient from "@/services/client";
+import ConnectStatus from "./connectStatus";
 import Pieces from "./pieces";
 import FileList from "./fileList";
 
@@ -16,8 +16,7 @@ function RenderTaskDetail(props) {
 
   const getTaskStatus = () => {
     taskId &&
-      tellStatus(taskId).then((res) => {
-        // console.log(res);
+      ariaClient.tellStatus(taskId).then((res) => {
         setTaskStatus(res || {});
       });
   };
@@ -30,7 +29,7 @@ function RenderTaskDetail(props) {
 
   return (
     <div>
-      <Tabs type="line">
+      <Tabs>
         <TabPane tab="总览" itemKey="dashPreview">
           <Overview taskStatus={taskStatus} />
         </TabPane>

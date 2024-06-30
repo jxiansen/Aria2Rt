@@ -1,10 +1,10 @@
-import { getPeers } from "@/services";
 import { useEffect, useRef, useMemo, useState } from "react";
 import { Table, Space } from "@douyinfe/semi-ui";
 import { IconArrowDown, IconArrowUp } from "@douyinfe/semi-icons";
 import BitFieldCanvas from "@/components/bitFieldSvg";
 import parseClientFromPeerid from "@/helpers/parsePeerid";
 import { decodePercentEncodedString, formattedFileSize } from "@/utils";
+import ariaClient from "@/services/client";
 
 function ConnectStatus(props) {
   const { taskId } = props || {};
@@ -12,7 +12,7 @@ function ConnectStatus(props) {
   const [peerList, setPeerList] = useState([]);
 
   const queryPeersStatus = () => {
-    getPeers(taskId).then((res) => {
+    ariaClient.getPeers(taskId).then((res) => {
       setPeerList(res || []);
     });
   };
